@@ -62,6 +62,7 @@ if (isset($_SESSION['user_id'])) {
             <li><a href="/" class="nav-link">Trang Chu</a></li>
             <li><a href="/index/?type=products" class="nav-link">Thuc Don</a></li>
             <li><a href="/cart/my_orders.php" class="nav-link">Don Hang</a></li>
+            <li><a href="/Game/duck_game.php" target="_blank" class="nav-link" style="color:#f5a623;font-weight:800;">🎮 Game Vịt 3D</a></li>
             <li><a href="/contact.php" class="nav-link">Lien He</a></li>
             <?php if ($current_user && $current_user['role'] === 'admin'): ?>
                 <li><a href="/amin/admin.php" class="nav-link" style="color:#E8622A;font-weight:700;">Quan Tri</a></li>

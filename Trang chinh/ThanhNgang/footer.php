@@ -46,5 +46,13 @@
     </div>
 </footer>
 
+<?php
+$ai_path = __DIR__ . '/../../Ai/duck_ai.php';
+if (file_exists($ai_path)) {
+    include_once $ai_path;
+}
+?>
+
+
 </body>
 </html>
