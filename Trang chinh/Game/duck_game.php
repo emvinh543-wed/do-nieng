@@ -61,7 +61,7 @@ if (isset($pdo)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vịt Con 3D Háu Ăn - Thế Giới Đa Bản Đồ & Đa Nhân Vật</title>
+    <title>Vịt Con 3D Háu Ăn - Thế Giới Đa Bản Đồ Vô Tận (Infinite Dynamic Map)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -118,13 +118,13 @@ if (isset($pdo)) {
 
         .score-board {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
 
         .hud-card {
             background: rgba(15, 23, 42, 0.85);
             border: 2px solid #f5a623;
-            padding: 8px 20px;
+            padding: 8px 18px;
             border-radius: 20px;
             backdrop-filter: blur(12px);
             text-align: center;
@@ -132,7 +132,7 @@ if (isset($pdo)) {
         }
 
         .hud-card label { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block; }
-        .hud-card span { font-size: 1.5rem; font-weight: 800; color: #fbbf24; }
+        .hud-card span { font-size: 1.4rem; font-weight: 800; color: #fbbf24; }
 
         /* Leaderboard Button */
         .btn-leaderboard-toggle {
@@ -337,6 +337,14 @@ if (isset($pdo)) {
                     <label>Thời Gian</label>
                     <span id="time-val">60s</span>
                 </div>
+                <div class="hud-card" style="border-color:#38bdf8;">
+                    <label>Khám Phá</label>
+                    <span id="dist-val" style="color:#38bdf8;">0m</span>
+                </div>
+                <div class="hud-card" style="border-color:#a855f7;">
+                    <label>Tọa Độ Chunk</label>
+                    <span id="chunk-val" style="color:#c084fc;font-size:1.1rem;">[0, 0]</span>
+                </div>
                 <button class="btn-leaderboard-toggle" onclick="toggleLeaderboardModal()">
                     🏆 BẢNG XẾP HẠNG
                 </button>
@@ -344,10 +352,10 @@ if (isset($pdo)) {
         </div>
 
         <div class="controls-hint">
-            <h4>🎮 Hướng Dẫn:</h4>
+            <h4>🗺️ Bản Đồ Vô Tận & Dynamic Loading:</h4>
             <div class="key-row">
                 Dùng <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> hoặc 
-                <span class="key">↑</span><span class="key">←</span><span class="key">↓</span><span class="key">→</span> điều khiển Vịt 3D qua cầu ăn 🍎🍊🍉🧋
+                <span class="key">↑</span><span class="key">←</span><span class="key">↓</span><span class="key">→</span> điều khiển Vịt tự do di chuyển khám phá thế giới 🌐
             </div>
         </div>
 
@@ -359,8 +367,8 @@ if (isset($pdo)) {
     <!-- Start / Character & Map Selection Modal -->
     <div class="game-modal" id="start-modal">
         <div class="modal-card">
-            <h2>🐥 CHỌN NHÂN VẬT VỊT & BẢN ĐỒ 🗺️</h2>
-            <p>Hãy tùy chọn chú Vịt 3D yêu thích và khám phá 4 Thế Giới Bản Đồ tuyệt đẹp!</p>
+            <h2>🐥 CHỌN NHÂN VẬT VỊT & BẢN ĐỒ VÔ TẬN 🗺️</h2>
+            <p>Khám phá thế giới 3D tự động sinh theo bước chân di chuyển của bạn ("Đi tới đâu load tới đó")!</p>
 
             <!-- Duck Skins Selection -->
             <div class="section-label">🐥 1. CHỌN CHÚ VỊT 3D CỦA BẠN:</div>
@@ -393,7 +401,7 @@ if (isset($pdo)) {
             </div>
 
             <!-- Map Worlds Selection -->
-            <div class="section-label">🗺️ 2. CHỌN THẾ GIỚI BẢN ĐỒ 3D:</div>
+            <div class="section-label">🗺️ 2. CHỌN THẾ GIỚI BẢN ĐỒ 3D (DYNAMIC CHUNK LOADING):</div>
             <div class="select-grid" id="map-world-grid">
                 <div class="select-card active" onclick="selectMapWorld('park', this)">
                     <span class="select-card-icon">🏞️</span>
@@ -414,6 +422,31 @@ if (isset($pdo)) {
                     <span class="select-card-icon">🌌</span>
                     <span class="select-card-name">Đêm Ngân Hà</span>
                     <span class="select-card-desc">Cyberpunk & cây pha lê</span>
+                </div>
+            </div>
+
+            <!-- Time Selection -->
+            <div class="section-label">⏱️ 3. CHỌN THỜI GIAN CHƠI:</div>
+            <div class="select-grid" id="time-select-grid" style="grid-template-columns:repeat(4,1fr);">
+                <div class="select-card" onclick="selectTime(60, this)">
+                    <span class="select-card-icon">⚡</span>
+                    <span class="select-card-name">60 Giây</span>
+                    <span class="select-card-desc">Chớp nhoáng nhanh</span>
+                </div>
+                <div class="select-card active" onclick="selectTime(180, this)">
+                    <span class="select-card-icon">🕐</span>
+                    <span class="select-card-name">3 Phút</span>
+                    <span class="select-card-desc">Vừa đủ khám phá</span>
+                </div>
+                <div class="select-card" onclick="selectTime(300, this)">
+                    <span class="select-card-icon">🕔</span>
+                    <span class="select-card-name">5 Phút</span>
+                    <span class="select-card-desc">Phiêu lưu cơ bản</span>
+                </div>
+                <div class="select-card" onclick="selectTime(5400, this)">
+                    <span class="select-card-icon">🌍</span>
+                    <span class="select-card-name">90 Phút</span>
+                    <span class="select-card-desc">Khám phá vô tận!</span>
                 </div>
             </div>
 
@@ -481,13 +514,14 @@ if (isset($pdo)) {
         </div>
     </div>
 
-    <!-- 3D MULTI-MAP & DUCK CHARACTER SYSTEM SCRIPT -->
+    <!-- 3D MULTI-MAP & DYNAMIC DYNAMIC CHUNK SYSTEM SCRIPT -->
     <script>
     const loggedInPlayerName = "<?php echo $logged_in_user ? addslashes($logged_in_user['fullname']) : 'Khách Vô Danh 🐥'; ?>";
 
     // Selected Options
     let currentDuckSkin = 'golden';
     let currentMapWorld = 'park';
+    let selectedTime = 180; // default 3 phút
 
     function selectDuckSkin(skin, el) {
         currentDuckSkin = skin;
@@ -501,6 +535,20 @@ if (isset($pdo)) {
         document.querySelectorAll('#map-world-grid .select-card').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         playQuackSound();
+    }
+
+    function selectTime(seconds, el) {
+        selectedTime = seconds;
+        document.querySelectorAll('#time-select-grid .select-card').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        playQuackSound();
+    }
+
+    function formatTime(secs) {
+        if (secs < 60) return secs + 's';
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        return m + ':' + (s < 10 ? '0' : '') + s;
     }
 
     // Audio FX Generator
@@ -530,13 +578,36 @@ if (isset($pdo)) {
         } catch(e){}
     }
 
-    // 3D Engine Objects
-    let scene, camera, renderer;
+    // 3D Engine Objects & Dynamic Infinite Chunk System
+    let scene, camera, renderer, dirLight;
     let duckGroup, duckBody, duckHead, duckBeak, duckWingL, duckWingR;
-    let worldObjectsGroup = new THREE.Group();
-    let waterMesh;
     let foods = [];
+    let activeAnimals = []; // {mesh, chunkKey, type, wanderAngle, wanderTimer, speed, bobOffset}
     let score = 0, timeLeft = 60, gameActive = false, timerInterval;
+
+    // INFINITE DYNAMIC CHUNK MAP CONFIGURATION ("Đi tới đâu load tới đó")
+    const CHUNK_SIZE = 90; // Each chunk tile is 90x90 units
+    const LOAD_RADIUS = 2; // Loads 5x5 grid of chunks (450m x 450m active rendering)
+    const activeChunks = new Map(); // key: "cx,cz" => THREE.Group
+
+    const MAP_THEMES = {
+        park: {
+            bg: 0x0b1329, ground: 0x16a34a, water: 0x0284c7, treeLeaf: 0x15803d, treeTrunk: 0x78350f, rock: 0x64748b, bridge: 0x854d0e,
+            emissiveWater: 0x000000, emissiveIntensity: 0
+        },
+        volcano: {
+            bg: 0x1a0505, ground: 0x262626, water: 0xd97706, treeLeaf: 0xb91c1c, treeTrunk: 0x451a03, rock: 0x44403c, bridge: 0x44403c,
+            emissiveWater: 0xd97706, emissiveIntensity: 0.6
+        },
+        snow: {
+            bg: 0x0f172a, ground: 0xe2e8f0, water: 0x38bdf8, treeLeaf: 0x0284c7, treeTrunk: 0x334155, rock: 0x94a3b8, bridge: 0x475569,
+            emissiveWater: 0x000000, emissiveIntensity: 0
+        },
+        galaxy: {
+            bg: 0x090514, ground: 0x4c1d95, water: 0xc084fc, treeLeaf: 0xf43f5e, treeTrunk: 0x7e22ce, rock: 0xa855f7, bridge: 0x581c87,
+            emissiveWater: 0xc084fc, emissiveIntensity: 0.6
+        }
+    };
 
     // Movement Controls
     const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false };
@@ -558,14 +629,12 @@ if (isset($pdo)) {
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
 
-        scene.add(worldObjectsGroup);
-
-        // Build Initial Map & Duck
-        build3DMapWorld(currentMapWorld);
+        // Create Duck & Dynamic Map
         create3DDuck(currentDuckSkin);
+        rebuildMapEnvironment();
 
-        // Spawn Initial Fruits
-        spawnFruitAndDrinkItems(22);
+        // Spawn Initial Fruits Around Duck
+        maintainFruitsAroundPlayer(0, 0);
 
         // Window resize
         window.addEventListener('resize', onWindowResize);
@@ -574,126 +643,389 @@ if (isset($pdo)) {
         animate();
     }
 
-    // MAP WORLD BUILDER (Park, Volcano, Snow, Galaxy)
-    function build3DMapWorld(mapKey) {
-        // Clear previous world objects
-        while(worldObjectsGroup.children.length > 0){ 
-            worldObjectsGroup.remove(worldObjectsGroup.children[0]); 
-        }
+    function rebuildMapEnvironment() {
+        const theme = MAP_THEMES[currentMapWorld] || MAP_THEMES.park;
+        scene.background = new THREE.Color(theme.bg);
+        scene.fog = new THREE.FogExp2(theme.bg, 0.008);
 
-        let bgHex = 0x0b1329;
-        let groundHex = 0x16a34a;
-        let waterHex = 0x0284c7;
-        let treeLeafHex = 0x15803d;
-        let treeTrunkHex = 0x78350f;
-        let rockHex = 0x64748b;
+        // Remove old lights
+        scene.children.filter(c => c.isLight).forEach(l => scene.remove(l));
 
-        if (mapKey === 'volcano') {
-            bgHex = 0x1a0505;
-            groundHex = 0x262626;
-            waterHex = 0xd97706; // Glowing Lava
-            treeLeafHex = 0xb91c1c;
-            treeTrunkHex = 0x451a03;
-            rockHex = 0x44403c;
-        } else if (mapKey === 'snow') {
-            bgHex = 0x0f172a;
-            groundHex = 0xe2e8f0;
-            waterHex = 0x38bdf8; // Frozen Ice Blue
-            treeLeafHex = 0x0284c7;
-            treeTrunkHex = 0x334155;
-            rockHex = 0x94a3b8;
-        } else if (mapKey === 'galaxy') {
-            bgHex = 0x090514;
-            groundHex = 0x4c1d95;
-            waterHex = 0xc084fc; // Glowing Purple Energy River
-            treeLeafHex = 0xf43f5e;
-            treeTrunkHex = 0x7e22ce;
-            rockHex = 0xa855f7;
-        }
+        const ambientLight = new THREE.AmbientLight(0xffffff, (currentMapWorld === 'galaxy' || currentMapWorld === 'volcano') ? 0.95 : 0.8);
+        scene.add(ambientLight);
 
-        scene.background = new THREE.Color(bgHex);
-        scene.fog = new THREE.FogExp2(bgHex, 0.012);
-
-        // Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, (mapKey==='galaxy'||mapKey==='volcano')?0.9:0.75);
-        worldObjectsGroup.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight((mapKey==='volcano')?0xff7733:0xfff5cc, 1.3);
+        dirLight = new THREE.DirectionalLight((currentMapWorld === 'volcano') ? 0xff7733 : 0xfff5cc, 1.3);
         dirLight.position.set(30, 45, 30);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048;
-        worldObjectsGroup.add(dirLight);
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 200;
+        dirLight.shadow.camera.left = -60;
+        dirLight.shadow.camera.right = 60;
+        dirLight.shadow.camera.top = 60;
+        dirLight.shadow.camera.bottom = -60;
+        scene.add(dirLight);
+
+        // Clear active chunks
+        for (const [key, group] of activeChunks.entries()) {
+            scene.remove(group);
+        }
+        activeChunks.clear();
+
+        // Load initial chunks around origin (0, 0)
+        updateWorldChunksAroundPlayer(0, 0);
+    }
+
+    // Pseudo-random generator for deterministic chunk generation
+    function seededRandom(seed) {
+        let x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+    }
+
+    // CREATE PROCEDURAL CHUNK AT (cx, cz)
+    function createChunkGroup(cx, cz, mapKey) {
+        const theme = MAP_THEMES[mapKey] || MAP_THEMES.park;
+        const chunkGroup = new THREE.Group();
+        const originX = cx * CHUNK_SIZE;
+        const originZ = cz * CHUNK_SIZE;
 
         // Ground Platform
-        const groundGeo = new THREE.BoxGeometry(110, 2, 110);
-        const groundMat = new THREE.MeshStandardMaterial({ color: groundHex, roughness: 0.7 });
+        const groundGeo = new THREE.BoxGeometry(CHUNK_SIZE, 2, CHUNK_SIZE);
+        const groundMat = new THREE.MeshStandardMaterial({ color: theme.ground, roughness: 0.7 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.position.y = -1;
+        ground.position.set(originX, -1, originZ);
         ground.receiveShadow = true;
-        worldObjectsGroup.add(ground);
+        chunkGroup.add(ground);
 
-        // River
-        const waterGeo = new THREE.PlaneGeometry(120, 16);
-        const waterMat = new THREE.MeshStandardMaterial({ 
-            color: waterHex, 
-            roughness: 0.1, 
-            metalness: 0.6, 
-            transparent: true, 
-            opacity: 0.9,
-            emissive: (mapKey==='volcano'||mapKey==='galaxy')?waterHex:0x000000,
-            emissiveIntensity: (mapKey==='volcano'||mapKey==='galaxy')?0.5:0
-        });
-        waterMesh = new THREE.Mesh(waterGeo, waterMat);
-        waterMesh.rotation.x = -Math.PI / 2;
-        waterMesh.position.set(0, 0.08, 0);
-        worldObjectsGroup.add(waterMesh);
+        // River Channel (Every 2nd horizontal or vertical chunk line)
+        const hasRiver = (Math.abs(cz) % 3 === 0);
+        if (hasRiver) {
+            const waterGeo = new THREE.PlaneGeometry(CHUNK_SIZE, 16);
+            const waterMat = new THREE.MeshStandardMaterial({
+                color: theme.water,
+                roughness: 0.1,
+                metalness: 0.6,
+                transparent: true,
+                opacity: 0.9,
+                emissive: theme.emissiveWater,
+                emissiveIntensity: theme.emissiveIntensity
+            });
+            const waterMesh = new THREE.Mesh(waterGeo, waterMat);
+            waterMesh.rotation.x = -Math.PI / 2;
+            waterMesh.position.set(originX, 0.08, originZ);
+            chunkGroup.add(waterMesh);
 
-        // Wooden / Stone Bridge
-        const bridgeGroup = new THREE.Group();
-        const plankMat = new THREE.MeshStandardMaterial({ color: (mapKey==='volcano'||mapKey==='galaxy')?0x44403c:0x854d0e, roughness: 0.8 });
-        for (let p = -8; p <= 8; p += 1.2) {
-            const plankGeo = new THREE.BoxGeometry(6, 0.25, 1);
-            const plank = new THREE.Mesh(plankGeo, plankMat);
-            plank.position.set(0, 0.2, p);
-            plank.castShadow = true; plank.receiveShadow = true;
-            bridgeGroup.add(plank);
+            // Wooden/Stone Bridge across river
+            const bridgeGroup = new THREE.Group();
+            const plankMat = new THREE.MeshStandardMaterial({ color: theme.bridge, roughness: 0.8 });
+            for (let p = -8; p <= 8; p += 1.2) {
+                const plankGeo = new THREE.BoxGeometry(7, 0.25, 1);
+                const plank = new THREE.Mesh(plankGeo, plankMat);
+                plank.position.set(0, 0.2, p);
+                plank.castShadow = true;
+                plank.receiveShadow = true;
+                bridgeGroup.add(plank);
+            }
+            bridgeGroup.position.set(originX, 0, originZ);
+            chunkGroup.add(bridgeGroup);
         }
-        bridgeGroup.position.set(0, 0, 0);
-        worldObjectsGroup.add(bridgeGroup);
 
-        // Trees
-        for (let i = 0; i < 35; i++) {
-            let tx = (Math.random() - 0.5) * 100;
-            let tz = (Math.random() - 0.5) * 100;
-            if (Math.abs(tz) < 10) tz += (tz > 0 ? 12 : -12);
-            
+        // Trees Generation (12-16 per chunk)
+        let seed = (cx * 73856093) ^ (cz * 19349663);
+        for (let i = 0; i < 14; i++) {
+            seed++;
+            const rx = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
+            seed++;
+            let rz = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
+            if (hasRiver && Math.abs(rz) < 10) rz += (rz > 0 ? 12 : -12);
+
+            const tx = originX + rx;
+            const tz = originZ + rz;
+
             const treeGroup = new THREE.Group();
             const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 3, 8);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: treeTrunkHex, roughness: 0.9 });
-            const trunk = new THREE.Mesh(trunkGeo, trunkMat); trunk.position.y = 1.5; trunk.castShadow = true;
+            const trunkMat = new THREE.MeshStandardMaterial({ color: theme.treeTrunk, roughness: 0.9 });
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.y = 1.5;
+            trunk.castShadow = true;
             treeGroup.add(trunk);
 
-            const foliageMat = new THREE.MeshStandardMaterial({ color: treeLeafHex, roughness: 0.5 });
-            const f1Geo = new THREE.ConeGeometry(2.2, 3, 8);
-            const f1 = new THREE.Mesh(f1Geo, foliageMat); f1.position.y = 3.5; f1.castShadow = true;
-            const f2 = new THREE.Mesh(f1Geo, foliageMat); f2.position.y = 4.8; f2.scale.set(0.8, 0.8, 0.8); f2.castShadow = true;
+            const foliageMat = new THREE.MeshStandardMaterial({ color: theme.treeLeaf, roughness: 0.5 });
+            const f1Geo = new THREE.ConeGeometry(2.2, 3.2, 8);
+            const f1 = new THREE.Mesh(f1Geo, foliageMat);
+            f1.position.y = 3.5;
+            f1.castShadow = true;
+            const f2 = new THREE.Mesh(f1Geo, foliageMat);
+            f2.position.y = 4.8;
+            f2.scale.set(0.78, 0.78, 0.78);
+            f2.castShadow = true;
             treeGroup.add(f1); treeGroup.add(f2);
             treeGroup.position.set(tx, 0, tz);
-            worldObjectsGroup.add(treeGroup);
+            chunkGroup.add(treeGroup);
         }
 
-        // Rocks
-        for (let i = 0; i < 25; i++) {
-            let rx = (Math.random() - 0.5) * 100;
-            let rz = (Math.random() - 0.5) * 100;
-            const rockGeo = new THREE.DodecahedronGeometry(0.8 + Math.random()*0.7, 1);
-            const rockMat = new THREE.MeshStandardMaterial({ color: rockHex, roughness: 0.8 });
+        // Rocks / Crystals Generation (8-12 per chunk)
+        for (let i = 0; i < 10; i++) {
+            seed++;
+            const rx = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 10);
+            seed++;
+            const rz = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 10);
+
+            const rockGeo = new THREE.DodecahedronGeometry(0.8 + seededRandom(seed)*0.6, 1);
+            const rockMat = new THREE.MeshStandardMaterial({ color: theme.rock, roughness: 0.8 });
             const rock = new THREE.Mesh(rockGeo, rockMat);
-            rock.rotation.set(Math.random(), Math.random(), Math.random());
-            rock.position.set(rx, 0.4, rz);
-            rock.castShadow = true; rock.receiveShadow = true;
-            worldObjectsGroup.add(rock);
+            rock.rotation.set(seededRandom(seed*2), seededRandom(seed*3), seededRandom(seed*4));
+            rock.position.set(originX + rx, 0.4, originZ + rz);
+            rock.castShadow = true;
+            rock.receiveShadow = true;
+            chunkGroup.add(rock);
         }
+
+        // Spawn Wildlife Animals
+        spawnAnimalsInChunk(cx, cz, chunkGroup, mapKey, seed);
+
+        return chunkGroup;
+    }
+
+    // SPAWN WILDLIFE ANIMALS PER MAP THEME
+    function spawnAnimalsInChunk(cx, cz, chunkGroup, mapKey, seedBase) {
+        const originX = cx * CHUNK_SIZE;
+        const originZ = cz * CHUNK_SIZE;
+        const chunkKey = `${cx},${cz}`;
+        let seed = seedBase + 9999;
+        const count = 4;
+
+        for (let i = 0; i < count; i++) {
+            seed++;
+            const ax = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 16);
+            seed++;
+            const az = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 16);
+            seed++;
+            const animalType = Math.floor(seededRandom(seed) * 3);
+
+            let animalGroup = new THREE.Group();
+            let animalSpeed = 0.018 + seededRandom(seed + 1) * 0.022;
+            let bobOffset = seededRandom(seed + 2) * Math.PI * 2;
+
+            if (mapKey === 'park') {
+                if (animalType === 0) { // 🐇 Rabbit
+                    const matW = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.6 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 10), matW);
+                    body.position.y = 0.38; body.castShadow = true;
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 10), matW);
+                    head.position.set(0, 0.72, 0.2); head.castShadow = true;
+                    const earGeo = new THREE.CylinderGeometry(0.06, 0.04, 0.42, 6);
+                    const earL = new THREE.Mesh(earGeo, new THREE.MeshStandardMaterial({ color: 0xf9c0c0 }));
+                    earL.position.set(-0.1, 1.05, 0.18); earL.rotation.z = 0.12;
+                    const earR = new THREE.Mesh(earGeo, new THREE.MeshStandardMaterial({ color: 0xf9c0c0 }));
+                    earR.position.set(0.1, 1.05, 0.18); earR.rotation.z = -0.12;
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0x220000 });
+                    const eyeL2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeM);
+                    eyeL2.position.set(-0.12, 0.76, 0.4);
+                    const eyeR2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeM);
+                    eyeR2.position.set(0.12, 0.76, 0.4);
+                    animalGroup.add(body, head, earL, earR, eyeL2, eyeR2);
+                    animalGroup.userData.animalName = 'rabbit';
+                } else if (animalType === 1) { // 🐸 Frog
+                    const matG = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.5 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 8), matG);
+                    body.position.y = 0.28; body.scale.y = 0.7;
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 10, 8), matG);
+                    head.position.set(0, 0.62, 0.22);
+                    const eyeGeo = new THREE.SphereGeometry(0.12, 8, 8);
+                    const eyeM = new THREE.MeshStandardMaterial({ color: 0xfbbf24 });
+                    const eyeL = new THREE.Mesh(eyeGeo, eyeM); eyeL.position.set(-0.2, 0.88, 0.28);
+                    const eyeR = new THREE.Mesh(eyeGeo, eyeM); eyeR.position.set(0.2, 0.88, 0.28);
+                    const pupilM = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                    const pupL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), pupilM); pupL.position.set(-0.2, 0.88, 0.38);
+                    const pupR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), pupilM); pupR.position.set(0.2, 0.88, 0.38);
+                    animalGroup.add(body, head, eyeL, eyeR, pupL, pupR);
+                    animalGroup.userData.animalName = 'frog';
+                    animalSpeed *= 0.6;
+                } else { // 🦋 Butterfly
+                    const wingM = new THREE.MeshStandardMaterial({ color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+                    const wingGeo = new THREE.SphereGeometry(0.38, 8, 6);
+                    const wL = new THREE.Mesh(wingGeo, wingM); wL.scale.set(1, 0.08, 1.4); wL.position.set(-0.35, 0, 0);
+                    const wR = new THREE.Mesh(wingGeo, wingM); wR.scale.set(1, 0.08, 1.4); wR.position.set(0.35, 0, 0);
+                    const body2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+                    animalGroup.add(wL, wR, body2);
+                    animalGroup.userData.animalName = 'butterfly';
+                    animalGroup.userData.flying = true;
+                    animalSpeed *= 1.5;
+                }
+
+            } else if (mapKey === 'volcano') {
+                if (animalType === 0) { // 🦎 Fire Lizard
+                    const matR = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 });
+                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.9, 8), matR); body.rotation.z = Math.PI / 2; body.position.y = 0.22;
+                    const head = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.36), matR); head.position.set(0.58, 0.22, 0);
+                    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.02, 0.7, 6), matR); tail.rotation.z = Math.PI / 2; tail.position.set(-0.75, 0.22, 0);
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeM); eyeL.position.set(0.62, 0.36, 0.14);
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeM); eyeR.position.set(0.62, 0.36, -0.14);
+                    animalGroup.add(body, head, tail, eyeL, eyeR);
+                    animalGroup.userData.animalName = 'lizard';
+                } else if (animalType === 1) { // 🦀 Lava Crab
+                    const matC = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.6 });
+                    const shell = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 8), matC); shell.scale.y = 0.55; shell.position.y = 0.22;
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+                    for (let li = -1; li <= 1; li += 2) {
+                        const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5), matC);
+                        leg1.rotation.z = Math.PI / 2 + 0.4 * li; leg1.position.set(0.5 * li, 0.18, 0.12);
+                        const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5), matC);
+                        leg2.rotation.z = Math.PI / 2 + 0.4 * li; leg2.position.set(0.5 * li, 0.18, -0.12);
+                        animalGroup.add(leg1, leg2);
+                    }
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeL.position.set(-0.18, 0.44, 0.3);
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeR.position.set(0.18, 0.44, 0.3);
+                    animalGroup.add(shell, eyeL, eyeR);
+                    animalGroup.userData.animalName = 'crab';
+                    animalSpeed *= 0.7;
+                } else { // 🦇 Bat
+                    const matD = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matD); body.position.y = 0;
+                    const wingL = new THREE.Mesh(new THREE.SphereGeometry(0.35, 6, 5), new THREE.MeshStandardMaterial({ color: 0x374151, transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
+                    wingL.scale.set(1, 0.06, 1.2); wingL.position.set(-0.42, 0, 0);
+                    const wingR = wingL.clone(); wingR.position.set(0.42, 0, 0);
+                    const earL = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.18, 5), matD); earL.position.set(-0.12, 0.28, 0);
+                    const earR = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.18, 5), matD); earR.position.set(0.12, 0.28, 0);
+                    animalGroup.add(body, wingL, wingR, earL, earR);
+                    animalGroup.userData.animalName = 'bat';
+                    animalGroup.userData.flying = true;
+                    animalSpeed *= 2.2;
+                }
+
+            } else if (mapKey === 'snow') {
+                if (animalType === 0) { // 🐧 Penguin
+                    const matB = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
+                    const matW = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 10, 10), matB); body.scale.y = 1.3; body.position.y = 0.5;
+                    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 8), matW); belly.scale.y = 1.2; belly.position.set(0, 0.5, 0.3);
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 10), matB); head.position.set(0, 1.08, 0);
+                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 5), new THREE.MeshStandardMaterial({ color: 0xf97316 })); beak.rotation.x = Math.PI / 2; beak.position.set(0, 1.06, 0.3);
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeL.position.set(-0.14, 1.14, 0.24);
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeR.position.set(0.14, 1.14, 0.24);
+                    animalGroup.add(body, belly, head, beak, eyeL, eyeR);
+                    animalGroup.userData.animalName = 'penguin';
+                    animalSpeed *= 0.7;
+                } else if (animalType === 1) { // 🐻‍❄️ Polar Bear
+                    const matW = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.8 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.65, 10, 10), matW); body.position.y = 0.62;
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 10, 10), matW); head.position.set(0, 1.3, 0.45);
+                    const earL = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), matW); earL.position.set(-0.28, 1.68, 0.42);
+                    const earR = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), matW); earR.position.set(0.28, 1.68, 0.42);
+                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), new THREE.MeshStandardMaterial({ color: 0x1e293b })); nose.position.set(0, 1.22, 0.83);
+                    animalGroup.add(body, head, earL, earR, nose);
+                    animalGroup.userData.animalName = 'polarbear';
+                    animalSpeed *= 0.5;
+                } else { // 🦉 Snow Owl
+                    const matW = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.6 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.38, 8, 10), matW); body.scale.y = 1.3; body.position.y = 0.48;
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), matW); head.position.set(0, 1.02, 0);
+                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.14, 4), new THREE.MeshStandardMaterial({ color: 0xf97316 })); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.96, 0.3);
+                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
+                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), eyeM); eyeL.position.set(-0.15, 1.08, 0.24);
+                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), eyeM); eyeR.position.set(0.15, 1.08, 0.24);
+                    animalGroup.add(body, head, beak, eyeL, eyeR);
+                    animalGroup.userData.animalName = 'owl';
+                    animalGroup.userData.flying = true;
+                    animalSpeed *= 1.2;
+                }
+
+            } else if (mapKey === 'galaxy') {
+                if (animalType === 0) { // 👾 Alien Jellyfish
+                    const matJ = new THREE.MeshStandardMaterial({ color: 0xc084fc, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.8, emissive: 0xc084fc, emissiveIntensity: 0.5 });
+                    const dome = new THREE.Mesh(new THREE.SphereGeometry(0.44, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), matJ); dome.position.y = 0.22;
+                    for (let ti = 0; ti < 6; ti++) {
+                        const tentGeo = new THREE.CylinderGeometry(0.03, 0.01, 0.55 + Math.random() * 0.3, 5);
+                        const tent = new THREE.Mesh(tentGeo, matJ);
+                        const ang = (ti / 6) * Math.PI * 2;
+                        tent.position.set(Math.cos(ang) * 0.28, -0.12, Math.sin(ang) * 0.28);
+                        animalGroup.add(tent);
+                    }
+                    animalGroup.add(dome);
+                    animalGroup.userData.animalName = 'jellyfish';
+                    animalGroup.userData.flying = true;
+                    animalSpeed *= 0.8;
+                } else if (animalType === 1) { // 🦌 Crystal Deer
+                    const matC = new THREE.MeshStandardMaterial({ color: 0x818cf8, roughness: 0.1, metalness: 0.8, emissive: 0x818cf8, emissiveIntensity: 0.3 });
+                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), matC); body.scale.set(1.4, 0.9, 0.9); body.position.y = 0.65;
+                    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 0.4, 6), matC); neck.position.set(0, 1.05, 0.3); neck.rotation.x = -0.4;
+                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matC); head.position.set(0, 1.36, 0.52);
+                    const antlerGeo = new THREE.CylinderGeometry(0.03, 0.05, 0.38, 4);
+                    const antL = new THREE.Mesh(antlerGeo, matC); antL.position.set(-0.14, 1.64, 0.5); antL.rotation.z = 0.3;
+                    const antR = new THREE.Mesh(antlerGeo, matC); antR.position.set(0.14, 1.64, 0.5); antR.rotation.z = -0.3;
+                    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg1.position.set(-0.22, 0.26, 0.18);
+                    const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg2.position.set(0.22, 0.26, 0.18);
+                    const leg3 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg3.position.set(-0.22, 0.26, -0.18);
+                    const leg4 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg4.position.set(0.22, 0.26, -0.18);
+                    animalGroup.add(body, neck, head, antL, antR, leg1, leg2, leg3, leg4);
+                    animalGroup.userData.animalName = 'crystal_deer';
+                } else { // ✨ Space Firefly
+                    const matF = new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 1.2, roughness: 0.1 });
+                    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), matF);
+                    const trail1 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.6, transparent: true, opacity: 0.6 })); trail1.position.z = -0.24;
+                    const trail2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 5, 5), new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.3, transparent: true, opacity: 0.35 })); trail2.position.z = -0.42;
+                    animalGroup.add(orb, trail1, trail2);
+                    animalGroup.userData.animalName = 'firefly';
+                    animalGroup.userData.flying = true;
+                    animalSpeed *= 2.5;
+                }
+            }
+
+            animalGroup.position.set(ax, animalGroup.userData.flying ? (1.2 + seededRandom(seed) * 2.5) : 0, az);
+            animalGroup.userData.chunkKey = chunkKey;
+            animalGroup.userData.wanderAngle = seededRandom(seed + 5) * Math.PI * 2;
+            animalGroup.userData.wanderTimer = seededRandom(seed + 6) * 120;
+            animalGroup.userData.speed = animalSpeed;
+            animalGroup.userData.bobOffset = seededRandom(seed + 7) * Math.PI * 2;
+            animalGroup.castShadow = true;
+            chunkGroup.add(animalGroup);
+            activeAnimals.push(animalGroup);
+        }
+    }
+
+    // DYNAMIC MAP CHUNK UPDATER ("Đi tới đâu load tới đó")
+    function updateWorldChunksAroundPlayer(px, pz) {
+        const currentChunkX = Math.floor((px + CHUNK_SIZE / 2) / CHUNK_SIZE);
+        const currentChunkZ = Math.floor((pz + CHUNK_SIZE / 2) / CHUNK_SIZE);
+
+        const neededKeys = new Set();
+        for (let dx = -LOAD_RADIUS; dx <= LOAD_RADIUS; dx++) {
+            for (let dz = -LOAD_RADIUS; dz <= LOAD_RADIUS; dz++) {
+                const cx = currentChunkX + dx;
+                const cz = currentChunkZ + dz;
+                const key = `${cx},${cz}`;
+                neededKeys.add(key);
+
+                if (!activeChunks.has(key)) {
+                    const chunkGroup = createChunkGroup(cx, cz, currentMapWorld);
+                    scene.add(chunkGroup);
+                    activeChunks.set(key, chunkGroup);
+                }
+            }
+        }
+
+        // Remove distant chunks out of render radius + cleanup their animals
+        for (const [key, group] of activeChunks.entries()) {
+            if (!neededKeys.has(key)) {
+                scene.remove(group);
+                activeChunks.delete(key);
+                // Remove animals belonging to this chunk
+                for (let ai = activeAnimals.length - 1; ai >= 0; ai--) {
+                    if (activeAnimals[ai].userData.chunkKey === key) {
+                        activeAnimals.splice(ai, 1);
+                    }
+                }
+            }
+        }
+
+        // Update HUD Chunk Coordinate & Distance
+        const distExplored = Math.floor(Math.sqrt(px*px + pz*pz));
+        document.getElementById('dist-val').innerText = distExplored + 'm';
+        document.getElementById('chunk-val').innerText = `[${currentChunkX}, ${currentChunkZ}]`;
     }
 
     // DUCK CHARACTER BUILDER (Golden, Cool, King, Fairy, Ninja)
@@ -774,13 +1106,24 @@ if (isset($pdo)) {
             duckGroup.add(bowL); duckGroup.add(bowR);
         }
 
-        duckGroup.position.set(0, 0, 15);
+        duckGroup.position.set(0, 0, 0);
         scene.add(duckGroup);
     }
 
-    // SPAWN HIGH QUALITY 3D FRUITS & DRINKS
-    function spawnFruitAndDrinkItems(count) {
-        for (let i = 0; i < count; i++) {
+    // SPAWN & MAINTAIN DYNAMIC FRUITS & DRINKS AROUND PLAYER
+    function maintainFruitsAroundPlayer(px, pz) {
+        // Remove foods that are too far (> 220m from player)
+        for (let i = foods.length - 1; i >= 0; i--) {
+            const food = foods[i];
+            const dist = Math.sqrt((food.position.x - px)**2 + (food.position.z - pz)**2);
+            if (dist > 230) {
+                scene.remove(food);
+                foods.splice(i, 1);
+            }
+        }
+
+        // Spawn items to maintain 40 active items near player
+        while (foods.length < 40) {
             const type = Math.floor(Math.random() * 6);
             let itemGroup = new THREE.Group();
             let points = 15;
@@ -831,11 +1174,10 @@ if (isset($pdo)) {
                 points = 20;
             }
 
-            let angle = Math.random() * Math.PI * 2;
-            let dist  = 4 + Math.random() * 45;
-            let fx = Math.cos(angle) * dist;
-            let fz = Math.sin(angle) * dist;
-            if (Math.abs(fz) < 7 && Math.abs(fx) > 4) fz += (fz > 0 ? 10 : -10);
+            const angle = Math.random() * Math.PI * 2;
+            const dist = 12 + Math.random() * 110;
+            const fx = px + Math.cos(angle) * dist;
+            const fz = pz + Math.sin(angle) * dist;
 
             itemGroup.position.set(fx, 0, fz);
             itemGroup.userData = { points: points, rotSpeed: 0.02 + Math.random()*0.03, floatOffset: Math.random()*Math.PI*2 };
@@ -847,10 +1189,6 @@ if (isset($pdo)) {
     function animate() {
         requestAnimationFrame(animate);
         const time = Date.now() * 0.003;
-
-        if (waterMesh) {
-            waterMesh.position.x = Math.sin(time * 0.5) * 1.5;
-        }
 
         if (gameActive) {
             let dx = 0, dz = 0;
@@ -864,19 +1202,9 @@ if (isset($pdo)) {
             }
 
             if (dx !== 0 || dz !== 0) {
-                const speed = 0.28;
+                const speed = 0.32;
                 duckGroup.position.x += dx * speed;
                 duckGroup.position.z += dz * speed;
-
-                if (Math.abs(duckGroup.position.z) < 7.5 && Math.abs(duckGroup.position.x) > 3.8) {
-                    duckGroup.position.z += (duckGroup.position.z > 0 ? 0.3 : -0.3);
-                }
-
-                const distFromCenter = Math.sqrt(duckGroup.position.x**2 + duckGroup.position.z**2);
-                if (distFromCenter > 48) {
-                    duckGroup.position.x = (duckGroup.position.x / distFromCenter) * 48;
-                    duckGroup.position.z = (duckGroup.position.z / distFromCenter) * 48;
-                }
 
                 const targetAngle = Math.atan2(dx, dz);
                 duckGroup.rotation.y = targetAngle;
@@ -889,24 +1217,70 @@ if (isset($pdo)) {
                 duckWingL.rotation.z = 0; duckWingR.rotation.z = 0;
             }
 
-            camera.position.x = duckGroup.position.x * 0.45;
-            camera.position.z = duckGroup.position.z * 0.45 + 26;
-            camera.lookAt(duckGroup.position.x * 0.6, 1, duckGroup.position.z * 0.6);
+            // Smooth 3D Camera Follow Player Infinitely
+            camera.position.x = THREE.MathUtils.lerp(camera.position.x, duckGroup.position.x, 0.08);
+            camera.position.z = THREE.MathUtils.lerp(camera.position.z, duckGroup.position.z + 28, 0.08);
+            camera.lookAt(duckGroup.position.x, 1, duckGroup.position.z);
 
+            // Light Follows Player for dynamic shadows
+            if (dirLight) {
+                dirLight.position.set(duckGroup.position.x + 30, 45, duckGroup.position.z + 30);
+            }
+
+            // Update Chunks & Food around Player position dynamically ("Đi tới đâu load tới đó")
+            updateWorldChunksAroundPlayer(duckGroup.position.x, duckGroup.position.z);
+            maintainFruitsAroundPlayer(duckGroup.position.x, duckGroup.position.z);
+
+            // Food collision check
             for (let i = foods.length - 1; i >= 0; i--) {
                 const food = foods[i];
                 food.rotation.y += food.userData.rotSpeed;
                 food.position.y = 0.2 + Math.sin(time * 4 + food.userData.floatOffset) * 0.25;
 
                 const dist = duckGroup.position.distanceTo(food.position);
-                if (dist < 2.0) {
+                if (dist < 2.2) {
                     playEatSound();
                     score += food.userData.points;
                     document.getElementById('score-val').innerText = score;
 
                     scene.remove(food);
                     foods.splice(i, 1);
-                    spawnFruitAndDrinkItems(1);
+                    maintainFruitsAroundPlayer(duckGroup.position.x, duckGroup.position.z);
+                }
+            }
+
+            // Animate Wildlife Animals
+            for (let ai = 0; ai < activeAnimals.length; ai++) {
+                const a = activeAnimals[ai];
+                const ud = a.userData;
+                ud.wanderTimer--;
+                if (ud.wanderTimer <= 0) {
+                    ud.wanderAngle += (Math.random() - 0.5) * 1.2;
+                    ud.wanderTimer = 80 + Math.random() * 120;
+                }
+                const spd = ud.speed;
+                a.position.x += Math.cos(ud.wanderAngle) * spd;
+                a.position.z += Math.sin(ud.wanderAngle) * spd;
+                a.rotation.y = ud.wanderAngle + Math.PI / 2;
+
+                const name = ud.animalName;
+                if (ud.flying) {
+                    a.position.y = (ud.baseY || 1.8) + Math.sin(time * 2.2 + ud.bobOffset) * 0.5;
+                    if (!ud.baseY) ud.baseY = a.position.y;
+                    // Butterfly/bat wing flap
+                    if (name === 'butterfly' && a.children[0]) {
+                        a.children[0].rotation.y = Math.sin(time * 12 + ud.bobOffset) * 0.7;
+                        a.children[1].rotation.y = -Math.sin(time * 12 + ud.bobOffset) * 0.7;
+                    }
+                    if (name === 'bat' && a.children[1]) {
+                        a.children[1].rotation.z = Math.sin(time * 10) * 0.55;
+                        a.children[2].rotation.z = -Math.sin(time * 10) * 0.55;
+                    }
+                } else {
+                    // Ground bobbing / hop
+                    if (name === 'rabbit') a.position.y = Math.abs(Math.sin(time * 7 + ud.bobOffset)) * 0.28;
+                    else if (name === 'penguin') a.position.y = 0; // waddle rotation
+                    else a.position.y = 0;
                 }
             }
         }
@@ -928,7 +1302,7 @@ if (isset($pdo)) {
 
     function startGame() {
         // Rebuild 3D world & duck skin if changed
-        build3DMapWorld(currentMapWorld);
+        rebuildMapEnvironment();
         create3DDuck(currentDuckSkin);
 
         document.getElementById('start-modal').style.display = 'none';
@@ -936,13 +1310,20 @@ if (isset($pdo)) {
         document.getElementById('lb-modal').style.display = 'none';
         
         score = 0;
-        timeLeft = 60;
+        timeLeft = selectedTime;
         gameActive = true;
+
+        // Clear & respawn foods around start
+        for (let fi = foods.length - 1; fi >= 0; fi--) {
+            scene.remove(foods[fi]);
+        }
+        foods = [];
+        maintainFruitsAroundPlayer(0, 0);
         
         document.getElementById('score-val').innerText = '0';
-        document.getElementById('time-val').innerText = '60s';
+        document.getElementById('time-val').innerText = formatTime(timeLeft);
 
-        if (duckGroup) duckGroup.position.set(0, 0, 15);
+        if (duckGroup) duckGroup.position.set(0, 0, 0);
 
         playQuackSound();
 
@@ -950,7 +1331,7 @@ if (isset($pdo)) {
         timerInterval = setInterval(function() {
             if (!gameActive) return;
             timeLeft--;
-            document.getElementById('time-val').innerText = timeLeft + 's';
+            document.getElementById('time-val').innerText = formatTime(timeLeft);
             
             if (timeLeft <= 0) {
                 endGame();
