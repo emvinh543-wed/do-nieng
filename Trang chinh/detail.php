@@ -8,6 +8,11 @@ $stmt = $pdo->prepare("SELECT p.*, c.name as category_name FROM products p JOIN 
 $stmt->execute([$id]);
 $product = $stmt->fetch();
 
+$site_lang = get_site_lang();
+if ($product) {
+    $product = localize_row($product, $site_lang, ['name','description','content']);
+}
+
 if (!$product) {
     echo '<div class="section" style="text-align:center;padding:100px 20px;"><h2>San pham khong ton tai!</h2><a href="/index/" class="btn btn-primary" style="margin-top:20px;">Ve Trang Chu</a></div>';
     require_once __DIR__ . '/../ThanhNgang/footer.php';
@@ -15,6 +20,12 @@ if (!$product) {
 }
 
 $toppings = $pdo->query("SELECT * FROM products WHERE category_id = 5 AND status = 1 ORDER BY price ASC")->fetchAll();
+// localize topping names
+if (!empty($toppings)) {
+    foreach ($toppings as $i => $t) {
+        $toppings[$i] = localize_row($t, $site_lang, ['name','description']);
+    }
+}
 $reviews_stmt = $pdo->prepare("SELECT r.*, u.fullname FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.product_id = ? AND r.status = 1 ORDER BY r.created_at DESC");
 $reviews_stmt->execute([$id]);
 $reviews = $reviews_stmt->fetchAll();

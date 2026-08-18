@@ -1,15 +1,4 @@
-<?php
-// Config inclusion with fallback
-if (file_exists(__DIR__ . '/../config/config.php')) {
-    require_once __DIR__ . '/../config/config.php';
-} elseif (file_exists(__DIR__ . '/../Trang chinh/config/config.php')) {
-    require_once __DIR__ . '/../Trang chinh/config/config.php';
-}
-
-// Get logged in user info if available
-$logged_in_user = null;
-if (isset($_SESSION['user_id']) && isset($pdo)) {
-    try {
+c   try {
         $stmt = $pdo->prepare("SELECT id, fullname, username FROM users WHERE id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         $logged_in_user = $stmt->fetch();

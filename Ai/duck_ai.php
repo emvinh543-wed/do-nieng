@@ -380,16 +380,18 @@
 <div class="duck-ai-widget" id="duck-ai-widget">
     <!-- Speech Bubble Following 3D Duck -->
     <div class="duck-speech-bubble" id="duck-speech-bubble" onclick="toggleDuckChat()">
-        <strong>🐥 Vịt Con AI 3D đang đi dạo! 👋</strong>
-        <span id="duck-bubble-text">Quạc quạc! Tớ là Vịt Con AI 3D. Tớ đi dạo quanh quán để xem bạn có cần giúp gì không nè!</span>
+        <strong data-i18n="duck_bubble_title">🦆 Vịt AI đang đi dạo! 👋</strong>
+        <span id="duck-bubble-text" data-i18n="duck_bubble_text">Chào! Tớ là trợ lý Vịt AI. Tớ đi quanh trang để giúp bạn — hỏi mình bất kỳ điều gì nhé!</span>
     </div>
 
     <!-- 3D Duck Wrapper with Ground Shadow -->
     <div class="duck-3d-wrapper" onclick="toggleDuckChat()">
         <div class="duck-ground-shadow"></div>
-        <button class="duck-avatar-btn" id="duck-avatar-btn" title="Trợ Lý Vịt Con AI 3D">
+        <button class="duck-avatar-btn" id="duck-avatar-btn" title="Trợ Lý Vịt AI">
             <span class="duck-waving-wing">👋</span>
-            <img src="/anh/duck_3d.png" alt="Vịt Con AI 3D Mascot" id="duck-img-el" class="duck-avatar-img" onerror="this.src='/anh/duck_ai.png'">
+            <!-- Lottie animation container (preferred) + fallback img -->
+            <div id="anime-lottie" style="width:100%;height:100%;border-radius:50%;overflow:hidden;"></div>
+            <img id="anime-fallback" src="/anh/duck_3d.png" alt="Duck AI Mascot" class="duck-avatar-img" style="display:none;" onerror="this.style.display='none'">
             <span class="duck-online-dot"></span>
         </button>
     </div>
@@ -399,10 +401,13 @@
         <!-- Header -->
         <div class="duck-chat-header">
             <div class="duck-chat-header-info">
-                <img src="/anh/duck_3d.png" alt="Duck 3D AI" class="duck-chat-header-img" onerror="this.src='/anh/duck_ai.png'">
+                <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;">
+                    <div id="anime-header-lottie" style="width:44px;height:44px"></div>
+                    <img id="anime-header-fallback" src="/anh/duck_3d.png" alt="Duck AI" class="duck-chat-header-img" style="display:none;" onerror="this.style.display='none'">
+                </div>
                 <div class="duck-chat-header-text">
-                    <h4>Vịt Con AI 3D 🐥</h4>
-                    <span>🟢 Trợ lý ảo GlowDrinks (Online)</span>
+                    <h4 data-i18n="duck_header_title">Vịt AI</h4>
+                    <span data-i18n="duck_header_status">🟢 Trợ lý ảo GlowDrinks (Online)</span>
                 </div>
             </div>
             <button class="duck-chat-close" onclick="toggleDuckChat()">✕</button>
@@ -412,28 +417,30 @@
         <div class="duck-chat-body" id="duck-chat-body">
             <!-- Welcome Message -->
             <div class="duck-msg ai">
-                <img src="/anh/duck_3d.png" class="duck-msg-avatar" onerror="this.src='/anh/duck_ai.png'">
-                <div class="duck-msg-bubble">
-                    Quạc quạc! 👋 🐥 Chào mừng bạn đến với <strong>GlowDrinks</strong>!<br><br>
-                    Tớ là <strong>Vịt Con AI 3D</strong> đang tung tăng đi dạo quanh màn hình nè!<br>
-                    Quán tớ phục vụ các món <strong>Trà Sữa, Cà Phê, Nước Ép tươi ngon</strong> giao hàng siêu tốc 20-30 phút!<br><br>
-                    <strong>Bạn có cần tui giúp gì không?</strong>
+                <div style="width:35px;height:35px;border-radius:50%;overflow:hidden;">
+                    <div id="anime-msg-lottie" style="width:35px;height:35px"></div>
+                    <img id="anime-msg-fallback" src="/anh/duck_3d.png" class="duck-msg-avatar" style="display:none;" onerror="this.style.display='none'">
+                </div>
+                <div class="duck-msg-bubble" data-i18n="duck_welcome_html">
+                    Xin chào! 👋 Chào mừng bạn đến với <strong>GlowDrinks</strong>!<br><br>
+                    Tớ là trợ lý <strong>Vịt AI</strong>, có thể giúp bạn tìm món, đặt hàng hoặc hướng dẫn thanh toán.<br><br>
+                    <strong>Bạn cần hỗ trợ gì hôm nay?</strong>
                 </div>
             </div>
 
             <!-- Quick Suggestions -->
             <div class="duck-quick-chips" id="duck-quick-chips">
-                <a href="/Game/duck_game.php" target="_blank" class="duck-chip" style="background:#f5a623;color:white;border-color:#f5a623;text-decoration:none;">🎮 Chơi Game Vịt 3D (Nhận Mã Giảm Giá)</a>
-                <button class="duck-chip" onclick="askDuck('Quán có những món nước nào ngon?')">🥤 Món nước bán chạy?</button>
-                <button class="duck-chip" onclick="askDuck('Thời gian giao hàng bao lâu?')">🛵 Giao hàng bao lâu?</button>
-                <button class="duck-chip" onclick="askDuck('Thanh toán bằng mã QR như thế nào?')">📱 Thanh toán QR?</button>
-                <button class="duck-chip" onclick="askDuck('Làm sao để đặt hàng?')">🛒 Hướng dẫn đặt hàng</button>
+                <a href="/Game/duck_game.php" target="_blank" class="duck-chip" style="background:#f5a623;color:white;border-color:#f5a623;text-decoration:none;" data-i18n="duck_chip_play">🎮 Chơi Game Vịt 3D (Nhận Mã Giảm Giá)</a>
+                <button class="duck-chip" onclick="askDuck('Quán có những món nước nào ngon?')" data-i18n="duck_chip_best">🥤 Món nước bán chạy?</button>
+                <button class="duck-chip" onclick="askDuck('Thời gian giao hàng bao lâu?')" data-i18n="duck_chip_delivery">🛵 Giao hàng bao lâu?</button>
+                <button class="duck-chip" onclick="askDuck('Thanh toán bằng mã QR như thế nào?')" data-i18n="duck_chip_qr">📱 Thanh toán QR?</button>
+                <button class="duck-chip" onclick="askDuck('Làm sao để đặt hàng?')" data-i18n="duck_chip_order">🛒 Hướng dẫn đặt hàng</button>
             </div>
         </div>
 
         <!-- Footer Input -->
         <div class="duck-chat-footer">
-            <input type="text" id="duck-chat-input" class="duck-chat-input" placeholder="Hỏi Vịt Con AI 3D bất kỳ điều gì..." onkeypress="handleDuckKeyPress(event)">
+            <input type="text" id="duck-chat-input" class="duck-chat-input" data-i18n-placeholder="duck_input_placeholder" placeholder="" onkeypress="handleDuckKeyPress(event)">
             <button class="duck-chat-send" onclick="sendDuckMessage()">➔</button>
         </div>
     </div>
@@ -601,10 +608,10 @@ function generateDuckReply(question) {
     }
 
     if (q.includes('chào') || q.includes('hi') || q.includes('hello')) {
-        return "Quạc quạc! 👋 🐥 Chào bạn nha! Vịt Con AI 3D rất vui được làm quen với bạn. Bạn cần Vịt tư vấn món nước hay hỗ trợ đặt hàng gì không nè?";
+        return "Quạc quạc! 👋 🦆 Chào bạn nha! Vịt AI rất vui được làm quen với bạn. Bạn cần Vịt tư vấn món nước hay hỗ trợ đặt hàng gì không nè?";
     }
 
-    return "Quạc quạc! 🐥 Vịt Con AI 3D đã ghi nhận câu hỏi của bạn. GlowDrinks luôn sẵn sàng phục vụ bạn những ly đồ uống thơm ngon nhất! Bạn có muốn Vịt tư vấn thêm về <strong>Menu món uống</strong> hay <strong>Phương thức thanh toán QR</strong> không?";
+    return "Quạc quạc! 🦆 Vịt AI đã ghi nhận câu hỏi của bạn. GlowDrinks luôn sẵn sàng phục vụ bạn những ly đồ uống thơm ngon nhất! Bạn có muốn Vịt tư vấn thêm về <strong>Menu món uống</strong> hay <strong>Phương thức thanh toán QR</strong> không?";
 }
 
 function scrollDuckChatBottom() {
@@ -617,5 +624,154 @@ function scrollDuckChatBottom() {
 // Start 3D Duck walking on page load after 1 second
 window.addEventListener('DOMContentLoaded', function() {
     setTimeout(startDuckWalking, 1000);
+    // Load Lottie animations for the anime avatar (if available)
+    setTimeout(loadLottieAnimations, 400);
 });
+
+// Load lottie-web and initialize containers; fallback to static image if unavailable.
+function loadLottieAnimations() {
+    const lottieCdn = 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js';
+    function showFallback(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+    }
+
+    // JSON animation source - replace with your character JSON or local path
+    const defaultJson = '/anh/anime_character.json'; // place your lottie json here
+    const sampleJson = 'https://assets2.lottiefiles.com/packages/lf20_jtbfg2nb.json';
+
+    function initLottie() {
+        try {
+            if (!window.lottie) return; // safety
+
+            const opts = [
+                {id: 'anime-lottie', path: defaultJson},
+                {id: 'anime-header-lottie', path: defaultJson},
+                {id: 'anime-msg-lottie', path: defaultJson}
+            ];
+
+            opts.forEach(o => {
+                const container = document.getElementById(o.id);
+                if (!container) return;
+                // try local json first, then sample remote json
+                fetch(o.path, {method: 'HEAD'}).then(r => {
+                    const url = (r.ok) ? o.path : sampleJson;
+                    window.lottie.loadAnimation({
+                        container: container,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: url
+                    });
+                }).catch(() => {
+                    // couldn't fetch head -> try sample
+                    window.lottie.loadAnimation({
+                        container: container,
+                        renderer: 'svg',
+                        loop: true,
+                        autoplay: true,
+                        path: sampleJson
+                    });
+                });
+            });
+        } catch (e) {
+            // show fallback images
+            showFallback('anime-fallback');
+            showFallback('anime-header-fallback');
+            showFallback('anime-msg-fallback');
+            console.log('Lottie init error', e);
+        }
+    }
+
+    // Dynamically load lottie script then init
+    if (window.lottie) {
+        initLottie();
+        return;
+    }
+
+    const s = document.createElement('script');
+    s.src = lottieCdn;
+    s.onload = initLottie;
+    s.onerror = function() {
+        showFallback('anime-fallback');
+        showFallback('anime-header-fallback');
+        showFallback('anime-msg-fallback');
+    };
+    document.head.appendChild(s);
+}
+
+// Sprite-sheet canvas avatar loader (uses /anh/ai_sprite.png if present)
+function loadSpriteAvatar() {
+    const spritePath = '/anh/ai_sprite.png';
+    // Default sprite config - adjust if your sheet differs
+    const spriteConfig = {
+        path: spritePath,
+        frameWidth: 48,
+        frameHeight: 64,
+        cols: 6,
+        rows: 4,
+        frameCount: 24,
+        fps: 10
+    };
+
+    // Check if sprite exists via HEAD
+    fetch(spritePath, { method: 'HEAD' }).then(r => {
+        if (!r.ok) throw new Error('no-sprite');
+        // create canvas inside anime-lottie container
+        const container = document.getElementById('anime-lottie');
+        if (!container) return;
+        container.innerHTML = '';
+        const canvas = document.createElement('canvas');
+        canvas.width = spriteConfig.frameWidth;
+        canvas.height = spriteConfig.frameHeight;
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.id = 'anime-sprite-canvas';
+        container.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.src = spriteConfig.path;
+
+        let frame = 0;
+        const interval = 1000 / spriteConfig.fps;
+        let last = performance.now();
+
+        function draw(now) {
+            const dt = now - last;
+            if (dt >= interval) {
+                last = now - (dt % interval);
+                const fx = (frame % spriteConfig.cols) * spriteConfig.frameWidth;
+                const fy = Math.floor(frame / spriteConfig.cols) * spriteConfig.frameHeight;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.imageSmoothingEnabled = false; // keep pixel art crisp
+                ctx.drawImage(img, fx, fy, spriteConfig.frameWidth, spriteConfig.frameHeight, 0, 0, canvas.width, canvas.height);
+                frame = (frame + 1) % spriteConfig.frameCount;
+            }
+            requestAnimationFrame(draw);
+        }
+
+        img.onload = function() {
+            requestAnimationFrame(draw);
+            // hide fallback images if any
+            const fb = document.getElementById('anime-fallback'); if (fb) fb.style.display = 'none';
+            const hfb = document.getElementById('anime-header-fallback'); if (hfb) hfb.style.display = 'none';
+            const mfb = document.getElementById('anime-msg-fallback'); if (mfb) mfb.style.display = 'none';
+        };
+
+        img.onerror = function() {
+            console.log('Sprite load error, will fallback to Lottie/image');
+        };
+    }).catch(() => {
+        // sprite not found, do nothing here
+        console.log('No sprite sheet found at', spritePath);
+    });
+}
+
+// Try sprite avatar first, then Lottie
+function initAvatar() {
+    loadSpriteAvatar();
+    // still load lottie as secondary option (it will only show if sprite not present)
+    loadLottieAnimations();
+}
 </script>

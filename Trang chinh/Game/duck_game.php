@@ -61,15 +61,16 @@ if (isset($pdo)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vịt Con 3D Háu Ăn - Thế Giới Đa Bản Đồ Vô Tận (Infinite Dynamic Map)</title>
+    <title>Vịt Con 3D Háu Ăn - Đồ Họa 3D Cao Cấp & Bản Đồ Sống Động</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Three.js 3D Engine -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/Game/lang.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; user-select: none; }
-        body { background: #0b1329; color: white; overflow: hidden; height: 100vh; width: 100vw; }
+        body { background: #070c18; color: white; overflow: hidden; height: 100vh; width: 100vw; }
         
         #game-canvas { width: 100vw; height: 100vh; display: block; }
         
@@ -81,7 +82,8 @@ if (isset($pdo)) {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px 25px;
+            padding: 18px 22px;
+            z-index: 10;
         }
 
         .hud-top {
@@ -95,16 +97,16 @@ if (isset($pdo)) {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             padding: 10px 20px;
             border-radius: 30px;
-            backdrop-filter: blur(12px);
-            border: 2px solid rgba(245, 166, 35, 0.4);
+            backdrop-filter: blur(14px);
+            border: 2px solid rgba(245, 166, 35, 0.5);
             pointer-events: auto;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .brand-logo img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #f5a623; }
+        .brand-logo img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #f5a623; }
         .brand-logo h1 { font-size: 1.15rem; font-weight: 800; color: #f5a623; }
         
         .user-tag {
@@ -118,21 +120,41 @@ if (isset($pdo)) {
 
         .score-board {
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            align-items: center;
         }
 
         .hud-card {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             border: 2px solid #f5a623;
-            padding: 8px 18px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 18px;
             backdrop-filter: blur(12px);
             text-align: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.4);
         }
 
-        .hud-card label { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block; }
-        .hud-card span { font-size: 1.4rem; font-weight: 800; color: #fbbf24; }
+        .hud-card label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; display: block; }
+        .hud-card span { font-size: 1.35rem; font-weight: 800; color: #fbbf24; }
+
+        /* First Person / Third Person Toggle Button */
+        .btn-view-toggle {
+            pointer-events: auto;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: 2px solid #34d399;
+            padding: 9px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 18px rgba(16, 185, 129, 0.4);
+            transition: all 0.25s ease;
+        }
+        .btn-view-toggle:hover { transform: scale(1.06); box-shadow: 0 6px 22px rgba(16, 185, 129, 0.6); }
 
         /* Leaderboard Button */
         .btn-leaderboard-toggle {
@@ -140,7 +162,7 @@ if (isset($pdo)) {
             background: linear-gradient(135deg, #0284c7, #0369a1);
             color: white;
             border: 2px solid #38bdf8;
-            padding: 8px 18px;
+            padding: 9px 16px;
             border-radius: 20px;
             font-weight: 800;
             font-size: 0.88rem;
@@ -158,24 +180,42 @@ if (isset($pdo)) {
             position: absolute;
             bottom: 20px;
             left: 25px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(255,255,255,0.18);
             padding: 12px 18px;
             border-radius: 18px;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
             pointer-events: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .controls-hint h4 { font-size: 0.82rem; color: #f5a623; margin-bottom: 6px; }
         .key-row { display: flex; gap: 6px; align-items: center; font-size: 0.8rem; color: #cbd5e1; }
         .key { background: #334155; padding: 4px 9px; border-radius: 6px; font-weight: 800; color: white; border-bottom: 2px solid #1e293b; }
 
+        /* First Person Crosshair */
+        #crosshair {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 14px; height: 14px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            display: none;
+            z-index: 20;
+        }
+        #crosshair::before, #crosshair::after {
+            content: ''; position: absolute; background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 0 4px rgba(0,0,0,0.8);
+        }
+        #crosshair::before { top: 6px; left: 0; width: 14px; height: 2px; }
+        #crosshair::after { top: 0; left: 6px; width: 2px; height: 14px; }
+
         /* Modals & Selection Drawer */
         .game-modal {
             position: absolute;
             inset: 0;
-            background: rgba(11, 19, 41, 0.9);
-            backdrop-filter: blur(14px);
+            background: rgba(7, 12, 24, 0.92);
+            backdrop-filter: blur(16px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -189,11 +229,11 @@ if (isset($pdo)) {
             border: 3px solid #f5a623;
             border-radius: 28px;
             padding: 35px 40px;
-            width: 720px;
+            width: 760px;
             max-width: 95%;
             text-align: center;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
-            max-height: 90vh;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+            max-height: 92vh;
             overflow-y: auto;
         }
 
@@ -208,7 +248,7 @@ if (isset($pdo)) {
 
         .select-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 12px;
             margin-bottom: 20px;
         }
@@ -232,7 +272,7 @@ if (isset($pdo)) {
         .select-card.active {
             border-color: #f5a623;
             background: linear-gradient(135deg, rgba(245, 166, 35, 0.25), rgba(217, 119, 6, 0.25));
-            box-shadow: 0 0 20px rgba(245, 166, 35, 0.4);
+            box-shadow: 0 0 22px rgba(245, 166, 35, 0.5);
         }
 
         .select-card-icon { font-size: 2.2rem; display: block; margin-bottom: 6px; }
@@ -243,7 +283,7 @@ if (isset($pdo)) {
             background: linear-gradient(135deg, #f5a623, #d97706);
             color: white;
             border: none;
-            padding: 14px 40px;
+            padding: 14px 42px;
             border-radius: 30px;
             font-size: 1.1rem;
             font-weight: 800;
@@ -311,18 +351,21 @@ if (isset($pdo)) {
     <!-- 3D Canvas -->
     <canvas id="game-canvas"></canvas>
 
+    <!-- First-Person Crosshair -->
+    <div id="crosshair"></div>
+
     <!-- HUD Layer -->
     <div class="hud-layer">
         <div class="hud-top">
             <div class="brand-logo">
                 <img src="/anh/duck_3d.png" alt="Duck 3D" onerror="this.src='https://ui-avatars.com/api/?name=Duck'">
                 <div>
-                    <h1>Vịt Con 3D Háu Ăn 🐥</h1>
+                    <h1 data-i18n="game_title">Vịt Con 3D Háu Ăn 🐥</h1>
                     <div class="user-tag">
                         <?php if ($logged_in_user): ?>
-                            🟢 Người chơi: <strong><?php echo htmlspecialchars($logged_in_user['fullname']); ?></strong>
+                            <span data-i18n="player_label">🟢 Người chơi:</span> <strong><?php echo htmlspecialchars($logged_in_user['fullname']); ?></strong>
                         <?php else: ?>
-                            👤 Khách (<a href="/login/login_demo.php" style="color:#f5a623;" target="_blank">Đăng nhập</a> để lưu tên)
+                            <span data-i18n="guest_label">👤 Khách</span> (<a href="/login/login_demo.php" style="color:#f5a623;" target="_blank" data-i18n="login_link">Đăng nhập</a> <span data-i18n="guest_suffix">để lưu tên</span>)
                         <?php endif; ?>
                     </div>
                 </div>
@@ -330,32 +373,36 @@ if (isset($pdo)) {
 
             <div class="score-board">
                 <div class="hud-card">
-                    <label>Điểm Số</label>
+                    <label data-i18n="score_label">Điểm Số</label>
                     <span id="score-val">0</span>
                 </div>
                 <div class="hud-card">
-                    <label>Thời Gian</label>
+                    <label data-i18n="time_label">Thời Gian</label>
                     <span id="time-val">60s</span>
                 </div>
                 <div class="hud-card" style="border-color:#38bdf8;">
-                    <label>Khám Phá</label>
+                    <label data-i18n="explore_label">Khám Phá</label>
                     <span id="dist-val" style="color:#38bdf8;">0m</span>
                 </div>
                 <div class="hud-card" style="border-color:#a855f7;">
-                    <label>Tọa Độ Chunk</label>
+                    <label data-i18n="chunk_label">Tọa Độ Chunk</label>
                     <span id="chunk-val" style="color:#c084fc;font-size:1.1rem;">[0, 0]</span>
                 </div>
-                <button class="btn-leaderboard-toggle" onclick="toggleLeaderboardModal()">
+                <button class="btn-view-toggle" id="btn-view-toggle" onclick="toggleFirstPersonView()" data-i18n="view_btn">
+                    👀 Chế độ 1st Person
+                </button>
+                <button class="btn-leaderboard-toggle" onclick="toggleLeaderboardModal()" data-i18n="leaderboard_btn">
                     🏆 BẢNG XẾP HẠNG
                 </button>
             </div>
         </div>
 
         <div class="controls-hint">
-            <h4>🗺️ Bản Đồ Vô Tận & Dynamic Loading:</h4>
+            <h4 data-i18n="controls_title">🗺️ Bản Đồ Vô Tận & Đồ Họa 3D Cao Cấp:</h4>
             <div class="key-row">
-                Dùng <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> hoặc 
-                <span class="key">↑</span><span class="key">←</span><span class="key">↓</span><span class="key">→</span> điều khiển Vịt tự do di chuyển khám phá thế giới 🌐
+                <span data-i18n="controls_text">Dùng</span> <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> 
+                <span data-i18n="controls_or">hoặc</span> <span class="key">↑</span><span class="key">←</span><span class="key">↓</span><span class="key">→</span> 
+                <span data-i18n="controls_desc">điều khiển Vịt (Nhấn V đổi Góc Nhìn 1st/3rd Person)</span> 🌐
             </div>
         </div>
 
@@ -367,105 +414,105 @@ if (isset($pdo)) {
     <!-- Start / Character & Map Selection Modal -->
     <div class="game-modal" id="start-modal">
         <div class="modal-card">
-            <h2>🐥 CHỌN NHÂN VẬT VỊT & BẢN ĐỒ VÔ TẬN 🗺️</h2>
-            <p>Khám phá thế giới 3D tự động sinh theo bước chân di chuyển của bạn ("Đi tới đâu load tới đó")!</p>
+            <h2 data-i18n="start_title">🐥 CHỌN NHÂN VẬT VỊT & THẾ GIỚI 3D SỐNG ĐỘNG 🗺️</h2>
+            <p data-i18n="start_subtitle">Khám phá thế giới 3D đa dạng: Thành phố, Nhà cửa, Đường rẫy tàu hỏa, Bãi biển, Tàu biển, Thác nước & Hồ ao!</p>
 
             <!-- Duck Skins Selection -->
-            <div class="section-label">🐥 1. CHỌN CHÚ VỊT 3D CỦA BẠN:</div>
+            <div class="section-label" data-i18n="duck_section_label">🐥 1. CHỌN CHÚ VỊT 3D CỦA BẠN:</div>
             <div class="select-grid" id="duck-skin-grid">
                 <div class="select-card active" onclick="selectDuckSkin('golden', this)">
                     <span class="select-card-icon">🐥</span>
-                    <span class="select-card-name">Vịt Vàng Vui Vẻ</span>
-                    <span class="select-card-desc">Vịt truyền thống rực rỡ</span>
+                    <span class="select-card-name" data-i18n="duck_golden_name">Vịt Vàng Vui Vẻ</span>
+                    <span class="select-card-desc" data-i18n="duck_golden_desc">Vịt truyền thống rực rỡ</span>
                 </div>
                 <div class="select-card" onclick="selectDuckSkin('cool', this)">
                     <span class="select-card-icon">🕶️</span>
-                    <span class="select-card-name">Vịt Cool Boy</span>
-                    <span class="select-card-desc">Kính râm ngầu mạ vàng</span>
+                    <span class="select-card-name" data-i18n="duck_cool_name">Vịt Cool Boy</span>
+                    <span class="select-card-desc" data-i18n="duck_cool_desc">Kính râm ngầu mạ vàng</span>
                 </div>
                 <div class="select-card" onclick="selectDuckSkin('king', this)">
                     <span class="select-card-icon">👑</span>
-                    <span class="select-card-name">Vịt Hoàng Gia</span>
-                    <span class="select-card-desc">Vương miện quyền lực</span>
+                    <span class="select-card-name" data-i18n="duck_king_name">Vịt Hoàng Gia</span>
+                    <span class="select-card-desc" data-i18n="duck_king_desc">Vương miện quyền lực</span>
                 </div>
                 <div class="select-card" onclick="selectDuckSkin('fairy', this)">
                     <span class="select-card-icon">🌸</span>
-                    <span class="select-card-name">Vịt Hồng Kẹo Ngọt</span>
-                    <span class="select-card-desc">Sắc hồng ngọt ngào</span>
+                    <span class="select-card-name" data-i18n="duck_fairy_name">Vịt Hồng Kẹo Ngọt</span>
+                    <span class="select-card-desc" data-i18n="duck_fairy_desc">Sắc hồng ngọt ngào</span>
                 </div>
                 <div class="select-card" onclick="selectDuckSkin('ninja', this)">
                     <span class="select-card-icon">🥷</span>
-                    <span class="select-card-name">Vịt Ninja Đen</span>
-                    <span class="select-card-desc">Băng trán & thân huyền bí</span>
+                    <span class="select-card-name" data-i18n="duck_ninja_name">Vịt Ninja Đen</span>
+                    <span class="select-card-desc" data-i18n="duck_ninja_desc">Băng trán & thân huyền bí</span>
                 </div>
             </div>
 
             <!-- Map Worlds Selection -->
-            <div class="section-label">🗺️ 2. CHỌN THẾ GIỚI BẢN ĐỒ 3D (DYNAMIC CHUNK LOADING):</div>
+            <div class="section-label" data-i18n="map_section_label">🗺️ 2. CHỌN THẾ GIỚI BẢN ĐỒ 3D (DYNAMIC CHUNK LOADING):</div>
             <div class="select-grid" id="map-world-grid">
                 <div class="select-card active" onclick="selectMapWorld('park', this)">
-                    <span class="select-card-icon">🏞️</span>
-                    <span class="select-card-name">Công Viên Xanh</span>
-                    <span class="select-card-desc">Sông thơ mộng & cây xanh</span>
+                    <span class="select-card-icon">🏙️</span>
+                    <span class="select-card-name" data-i18n="map_park_name">Đô Thị & Công Viên Xanh</span>
+                    <span class="select-card-desc" data-i18n="map_park_desc">Thành phố, Tàu biển, Tàu hỏa & Hồ ao</span>
                 </div>
                 <div class="select-card" onclick="selectMapWorld('volcano', this)">
                     <span class="select-card-icon">🌋</span>
-                    <span class="select-card-name">Đảo Núi Lửa</span>
-                    <span class="select-card-desc">Dòng Dung Nham đỏ rực</span>
+                    <span class="select-card-name" data-i18n="map_volcano_name">Đảo Núi Lửa & Dung Nham</span>
+                    <span class="select-card-desc" data-i18n="map_volcano_desc">Dòng Dung Nham & Tàu chiến</span>
                 </div>
                 <div class="select-card" onclick="selectMapWorld('snow', this)">
                     <span class="select-card-icon">❄️</span>
-                    <span class="select-card-name">Vương Quốc Băng</span>
-                    <span class="select-card-desc">Tuyết trắng & sông băng</span>
+                    <span class="select-card-name" data-i18n="map_snow_name">Vương Quốc Băng & Tuyết</span>
+                    <span class="select-card-desc" data-i18n="map_snow_desc">Tuyết trắng, Sông băng & Tàu phá băng</span>
                 </div>
                 <div class="select-card" onclick="selectMapWorld('galaxy', this)">
                     <span class="select-card-icon">🌌</span>
-                    <span class="select-card-name">Đêm Ngân Hà</span>
-                    <span class="select-card-desc">Cyberpunk & cây pha lê</span>
+                    <span class="select-card-name" data-i18n="map_galaxy_name">Đêm Ngân Hà Cyberpunk</span>
+                    <span class="select-card-desc" data-i18n="map_galaxy_desc">Thành phố Cyber, Tàu vũ trụ & Pha lê</span>
                 </div>
             </div>
 
             <!-- Time Selection -->
-            <div class="section-label">⏱️ 3. CHỌN THỜI GIAN CHƠI:</div>
+            <div class="section-label" data-i18n="time_section_label">⏱️ 3. CHỌN THỜI GIAN CHƠI:</div>
             <div class="select-grid" id="time-select-grid" style="grid-template-columns:repeat(4,1fr);">
                 <div class="select-card" onclick="selectTime(60, this)">
                     <span class="select-card-icon">⚡</span>
-                    <span class="select-card-name">60 Giây</span>
-                    <span class="select-card-desc">Chớp nhoáng nhanh</span>
+                    <span class="select-card-name" data-i18n="time_60_name">60 Giây</span>
+                    <span class="select-card-desc" data-i18n="time_60_desc">Chớp nhoáng nhanh</span>
                 </div>
                 <div class="select-card active" onclick="selectTime(180, this)">
                     <span class="select-card-icon">🕐</span>
-                    <span class="select-card-name">3 Phút</span>
-                    <span class="select-card-desc">Vừa đủ khám phá</span>
+                    <span class="select-card-name" data-i18n="time_180_name">3 Phút</span>
+                    <span class="select-card-desc" data-i18n="time_180_desc">Vừa đủ khám phá</span>
                 </div>
                 <div class="select-card" onclick="selectTime(300, this)">
                     <span class="select-card-icon">🕔</span>
-                    <span class="select-card-name">5 Phút</span>
-                    <span class="select-card-desc">Phiêu lưu cơ bản</span>
+                    <span class="select-card-name" data-i18n="time_300_name">5 Phút</span>
+                    <span class="select-card-desc" data-i18n="time_300_desc">Phiêu lưu cơ bản</span>
                 </div>
                 <div class="select-card" onclick="selectTime(5400, this)">
                     <span class="select-card-icon">🌍</span>
-                    <span class="select-card-name">90 Phút</span>
-                    <span class="select-card-desc">Khám phá vô tận!</span>
+                    <span class="select-card-name" data-i18n="time_5400_name">90 Phút</span>
+                    <span class="select-card-desc" data-i18n="time_5400_desc">Khám phá vô tận!</span>
                 </div>
             </div>
 
-            <button class="btn-play" onclick="startGame()">🚀 BẮT ĐẦU VÀO GAME NGAY</button>
+            <button class="btn-play" onclick="startGame()" data-i18n="start_game_btn">🚀 BẮT ĐẦU VÀO GAME NGAY</button>
         </div>
     </div>
 
     <!-- Leaderboard Modal -->
     <div class="game-modal" id="lb-modal" style="display:none;">
-        <div class="modal-card" style="width:550px;">
-            <h2 style="color:#38bdf8;">🏆 BẢNG XẾP HẠNG TOP CAO THỦ</h2>
-            <p>Danh sách 10 người chơi ghi điểm cao nhất trong Game Vịt 3D:</p>
+        <div class="modal-card" style="width:560px;">
+            <h2 style="color:#38bdf8;" data-i18n="leaderboard_title">🏆 BẢNG XẾP HẠNG TOP CAO THỦ</h2>
+            <p data-i18n="leaderboard_desc">Danh sách 10 người chơi ghi điểm cao nhất trong Game Vịt 3D:</p>
             
             <table class="lb-table">
                 <thead>
                     <tr>
-                        <th style="width:50px;">Hạng</th>
-                        <th>Tên Người Chơi</th>
-                        <th style="text-align:right;">Điểm Số</th>
+                        <th style="width:50px;" data-i18n="table_rank">Hạng</th>
+                        <th data-i18n="table_player">Tên Người Chơi</th>
+                        <th style="text-align:right;" data-i18n="table_score">Điểm Số</th>
                     </tr>
                 </thead>
                 <tbody id="lb-table-body">
@@ -484,13 +531,13 @@ if (isset($pdo)) {
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="3" style="text-align:center;">Chưa có dữ liệu xếp hạng</td></tr>
+                        <tr><td colspan="3" style="text-align:center;" data-i18n="no_rank_data">Chưa có dữ liệu xếp hạng</td></tr>
                     <?php endif; ?>
                 </tbody>
             </table>
 
             <div style="margin-top:20px;">
-                <button class="btn-play" onclick="toggleLeaderboardModal()" style="background:#475569;">ĐÓNG BẢNG</button>
+                <button class="btn-play" onclick="toggleLeaderboardModal()" style="background:#475569;" data-i18n="leaderboard_close">ĐÓNG BẢNG</button>
             </div>
         </div>
     </div>
@@ -499,29 +546,34 @@ if (isset($pdo)) {
     <div class="game-modal" id="end-modal" style="display:none;">
         <div class="modal-card" style="width:500px;">
             <img src="/anh/duck_3d.png" alt="Duck 3D" style="width:85px;height:85px;border-radius:50%;border:3px solid #f5a623;">
-            <h2 style="color:#22c55e;">🎉 HOÀN THÀNH CHUYẾN ĐI!</h2>
-            <p>Tên hiển thị: <strong><?php echo $logged_in_user ? htmlspecialchars($logged_in_user['fullname']) : 'Khách Vô Danh'; ?></strong></p>
+            <h2 style="color:#22c55e;" data-i18n="end_title">🎉 HOÀN THÀNH CHUYẾN ĐI!</h2>
+            <p><span data-i18n="display_name_label">Tên hiển thị:</span> <strong><?php echo $logged_in_user ? htmlspecialchars($logged_in_user['fullname']) : 'Khách Vô Danh'; ?></strong></p>
             <div style="font-size:2.5rem;font-weight:800;color:#fbbf24;margin-bottom:10px;" id="final-score">0 ĐIỂM</div>
             
             <div id="voucher-result" class="voucher-box" style="display:none;">
-                🎟️ Mã Giảm Giá 20%: <strong>GLOWDUCK20</strong>
+                <span data-i18n="voucher_label">🎟️ Mã Giảm Giá 20%:</span> <strong>GLOWDUCK20</strong>
             </div>
 
             <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
-                <button class="btn-play" onclick="showStartModal()">🔄 ĐỔI BẢN ĐỒ / VỊT KÍCH THÍCH</button>
-                <button class="btn-play" onclick="toggleLeaderboardModal()" style="background:#0284c7;">🏆 XEM BẢNG HẠNG</button>
+                <button class="btn-play" onclick="showStartModal()" data-i18n="restart_btn">🔄 ĐỔI BẢN ĐỒ / VỊT KÍCH THÍCH</button>
+                <button class="btn-play" onclick="toggleLeaderboardModal()" style="background:#0284c7;" data-i18n="view_leaderboard_btn">🏆 XEM BẢNG HẠNG</button>
             </div>
         </div>
     </div>
 
-    <!-- 3D MULTI-MAP & DYNAMIC DYNAMIC CHUNK SYSTEM SCRIPT -->
+    <!-- 3D MULTI-MAP & FIRST-PERSON SYSTEM SCRIPT -->
     <script>
     const loggedInPlayerName = "<?php echo $logged_in_user ? addslashes($logged_in_user['fullname']) : 'Khách Vô Danh 🐥'; ?>";
 
-    // Selected Options
+    // Options
     let currentDuckSkin = 'golden';
     let currentMapWorld = 'park';
-    let selectedTime = 180; // default 3 phút
+    let selectedTime = 180;
+
+    // View Mode State: false = 3rd Person, true = 1st Person
+    let isFirstPerson = false;
+    let fpYaw = 0;   // Yaw angle (horizontal look)
+    let fpPitch = 0; // Pitch angle (vertical look)
 
     function selectDuckSkin(skin, el) {
         currentDuckSkin = skin;
@@ -551,7 +603,7 @@ if (isset($pdo)) {
         return m + ':' + (s < 10 ? '0' : '') + s;
     }
 
-    // Audio FX Generator
+    // Sound Generator
     function playQuackSound() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -578,38 +630,87 @@ if (isset($pdo)) {
         } catch(e){}
     }
 
-    // 3D Engine Objects & Dynamic Infinite Chunk System
-    let scene, camera, renderer, dirLight;
+    // Toggle 1st Person / 3rd Person View
+    function toggleFirstPersonView() {
+        isFirstPerson = !isFirstPerson;
+        const btn = document.getElementById('btn-view-toggle');
+        const crosshair = document.getElementById('crosshair');
+
+        if (isFirstPerson) {
+            btn.innerHTML = '🔭 Chế độ 3rd Person';
+            btn.style.background = 'linear-gradient(135deg, #8b5cf6, #6d28d9)';
+            btn.style.borderColor = '#a78bfa';
+            crosshair.style.display = 'block';
+            if (duckBeak) duckBeak.visible = true;
+            // Lock pointer for mouse look if game active
+            if (gameActive) {
+                document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock;
+                if (document.body.requestPointerLock) document.body.requestPointerLock();
+            }
+        } else {
+            btn.innerHTML = '👀 Chế độ 1st Person';
+            btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            btn.style.borderColor = '#34d399';
+            crosshair.style.display = 'none';
+            if (duckBeak) duckBeak.visible = true;
+            if (document.exitPointerLock) document.exitPointerLock();
+        }
+        playQuackSound();
+    }
+
+    // Mouse look event listener for 1st person
+    window.addEventListener('mousemove', e => {
+        if (!gameActive || !isFirstPerson) return;
+        const movementX = e.movementX || e.mozMovementX || 0;
+        const movementY = e.movementY || e.mozMovementY || 0;
+
+        fpYaw -= movementX * 0.003;
+        fpPitch -= movementY * 0.003;
+        // Limit pitch looking up/down
+        fpPitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, fpPitch));
+    });
+
+    // Press 'V' or 'F' to toggle View Mode
+    window.addEventListener('keydown', e => {
+        if (e.key === 'v' || e.key === 'V' || e.key === 'f' || e.key === 'F') {
+            toggleFirstPersonView();
+        }
+    });
+
+    // 3D Objects & Dynamic Infinite Chunk System
+    let scene, camera, renderer, dirLight, hemiLight;
     let duckGroup, duckBody, duckHead, duckBeak, duckWingL, duckWingR;
     let foods = [];
-    let activeAnimals = []; // {mesh, chunkKey, type, wanderAngle, wanderTimer, speed, bobOffset}
+    let activeAnimals = [];
+    let activeTrains = [];
+    let activeShips = [];
+    let activeParticles = null;
+    let trainSteamParticles = [];
     let score = 0, timeLeft = 60, gameActive = false, timerInterval;
 
-    // INFINITE DYNAMIC CHUNK MAP CONFIGURATION ("Đi tới đâu load tới đó")
-    const CHUNK_SIZE = 90; // Each chunk tile is 90x90 units
-    const LOAD_RADIUS = 2; // Loads 5x5 grid of chunks (450m x 450m active rendering)
-    const activeChunks = new Map(); // key: "cx,cz" => THREE.Group
+    const CHUNK_SIZE = 90;
+    const LOAD_RADIUS = 2;
+    const activeChunks = new Map();
 
     const MAP_THEMES = {
         park: {
-            bg: 0x0b1329, ground: 0x16a34a, water: 0x0284c7, treeLeaf: 0x15803d, treeTrunk: 0x78350f, rock: 0x64748b, bridge: 0x854d0e,
-            emissiveWater: 0x000000, emissiveIntensity: 0
+            bg: 0x0b172a, ground: 0x15803d, water: 0x0284c7, treeLeaf: 0x16a34a, treeTrunk: 0x78350f, rock: 0x64748b, bridge: 0x92400e,
+            emissiveWater: 0x0284c7, emissiveIntensity: 0.1, particleColor: 0x86efac
         },
         volcano: {
-            bg: 0x1a0505, ground: 0x262626, water: 0xd97706, treeLeaf: 0xb91c1c, treeTrunk: 0x451a03, rock: 0x44403c, bridge: 0x44403c,
-            emissiveWater: 0xd97706, emissiveIntensity: 0.6
+            bg: 0x1c0a0a, ground: 0x262626, water: 0xeab308, treeLeaf: 0xd97706, treeTrunk: 0x451a03, rock: 0x57534e, bridge: 0x44403c,
+            emissiveWater: 0xd97706, emissiveIntensity: 0.7, particleColor: 0xf97316
         },
         snow: {
-            bg: 0x0f172a, ground: 0xe2e8f0, water: 0x38bdf8, treeLeaf: 0x0284c7, treeTrunk: 0x334155, rock: 0x94a3b8, bridge: 0x475569,
-            emissiveWater: 0x000000, emissiveIntensity: 0
+            bg: 0x0f172a, ground: 0xf1f5f9, water: 0x38bdf8, treeLeaf: 0x0284c7, treeTrunk: 0x334155, rock: 0x94a3b8, bridge: 0x475569,
+            emissiveWater: 0x38bdf8, emissiveIntensity: 0.1, particleColor: 0xffffff
         },
         galaxy: {
-            bg: 0x090514, ground: 0x4c1d95, water: 0xc084fc, treeLeaf: 0xf43f5e, treeTrunk: 0x7e22ce, rock: 0xa855f7, bridge: 0x581c87,
-            emissiveWater: 0xc084fc, emissiveIntensity: 0.6
+            bg: 0x080414, ground: 0x3b0764, water: 0xc084fc, treeLeaf: 0xf43f5e, treeTrunk: 0x6b21a8, rock: 0xa855f7, bridge: 0x581c87,
+            emissiveWater: 0xc084fc, emissiveIntensity: 0.8, particleColor: 0xec4899
         }
     };
 
-    // Movement Controls
     const keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowLeft: false, ArrowDown: false, ArrowRight: false };
     let moveVector = { x: 0, z: 0 };
 
@@ -620,374 +721,356 @@ if (isset($pdo)) {
         const canvas = document.getElementById('game-canvas');
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 22, 28);
         camera.lookAt(0, 0, 0);
 
-        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        // Create Duck & Dynamic Map
         create3DDuck(currentDuckSkin);
         rebuildMapEnvironment();
-
-        // Spawn Initial Fruits Around Duck
         maintainFruitsAroundPlayer(0, 0);
 
-        // Window resize
         window.addEventListener('resize', onWindowResize);
-
-        // Start render loop
         animate();
     }
 
     function rebuildMapEnvironment() {
         const theme = MAP_THEMES[currentMapWorld] || MAP_THEMES.park;
         scene.background = new THREE.Color(theme.bg);
-        scene.fog = new THREE.FogExp2(theme.bg, 0.008);
+        scene.fog = new THREE.FogExp2(theme.bg, 0.007);
 
         // Remove old lights
         scene.children.filter(c => c.isLight).forEach(l => scene.remove(l));
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, (currentMapWorld === 'galaxy' || currentMapWorld === 'volcano') ? 0.95 : 0.8);
-        scene.add(ambientLight);
+        hemiLight = new THREE.HemisphereLight(0xffffff, theme.ground, 0.65);
+        scene.add(hemiLight);
 
-        dirLight = new THREE.DirectionalLight((currentMapWorld === 'volcano') ? 0xff7733 : 0xfff5cc, 1.3);
-        dirLight.position.set(30, 45, 30);
+        dirLight = new THREE.DirectionalLight((currentMapWorld === 'volcano') ? 0xff6622 : 0xfffae6, 1.35);
+        dirLight.position.set(40, 60, 40);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.bias = -0.0001;
         dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 200;
-        dirLight.shadow.camera.left = -60;
-        dirLight.shadow.camera.right = 60;
-        dirLight.shadow.camera.top = 60;
-        dirLight.shadow.camera.bottom = -60;
+        dirLight.shadow.camera.far = 250;
+        dirLight.shadow.camera.left = -70;
+        dirLight.shadow.camera.right = 70;
+        dirLight.shadow.camera.top = 70;
+        dirLight.shadow.camera.bottom = -70;
         scene.add(dirLight);
+
+        // Particle atmosphere
+        createWeatherParticles(theme.particleColor);
 
         // Clear active chunks
         for (const [key, group] of activeChunks.entries()) {
             scene.remove(group);
         }
         activeChunks.clear();
+        activeTrains = [];
+        activeShips = [];
 
-        // Load initial chunks around origin (0, 0)
         updateWorldChunksAroundPlayer(0, 0);
     }
 
-    // Pseudo-random generator for deterministic chunk generation
+    // Atmosphere Particle System
+    function createWeatherParticles(colorHex) {
+        if (activeParticles) scene.remove(activeParticles);
+        const count = 400;
+        const geom = new THREE.BufferGeometry();
+        const positions = new Float32Array(count * 3);
+
+        for (let i = 0; i < count; i++) {
+            positions[i*3] = (Math.random() - 0.5) * 350;
+            positions[i*3+1] = Math.random() * 100;
+            positions[i*3+2] = (Math.random() - 0.5) * 350;
+        }
+
+        geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const mat = new THREE.PointsMaterial({
+            color: colorHex,
+            size: 1.4,
+            transparent: true,
+            opacity: 0.65
+        });
+
+        activeParticles = new THREE.Points(geom, mat);
+        scene.add(activeParticles);
+    }
+
     function seededRandom(seed) {
         let x = Math.sin(seed) * 10000;
         return x - Math.floor(x);
     }
 
-    // CREATE PROCEDURAL CHUNK AT (cx, cz)
+    // PROCEDURAL CHUNK BUILDER (Houses, City, Railways, Trains, Lakes, Ocean, Ships, Docks, Beaches)
     function createChunkGroup(cx, cz, mapKey) {
         const theme = MAP_THEMES[mapKey] || MAP_THEMES.park;
         const chunkGroup = new THREE.Group();
         const originX = cx * CHUNK_SIZE;
         const originZ = cz * CHUNK_SIZE;
 
-        // Ground Platform
+        // Ground Tile
         const groundGeo = new THREE.BoxGeometry(CHUNK_SIZE, 2, CHUNK_SIZE);
-        const groundMat = new THREE.MeshStandardMaterial({ color: theme.ground, roughness: 0.7 });
+        const groundMat = new THREE.MeshStandardMaterial({ color: theme.ground, roughness: 0.75 });
         const ground = new THREE.Mesh(groundGeo, groundMat);
         ground.position.set(originX, -1, originZ);
         ground.receiveShadow = true;
         chunkGroup.add(ground);
 
-        // River Channel (Every 2nd horizontal or vertical chunk line)
-        const hasRiver = (Math.abs(cz) % 3 === 0);
-        if (hasRiver) {
-            const waterGeo = new THREE.PlaneGeometry(CHUNK_SIZE, 16);
-            const waterMat = new THREE.MeshStandardMaterial({
-                color: theme.water,
-                roughness: 0.1,
-                metalness: 0.6,
-                transparent: true,
-                opacity: 0.9,
-                emissive: theme.emissiveWater,
-                emissiveIntensity: theme.emissiveIntensity
-            });
-            const waterMesh = new THREE.Mesh(waterGeo, waterMat);
-            waterMesh.rotation.x = -Math.PI / 2;
-            waterMesh.position.set(originX, 0.08, originZ);
-            chunkGroup.add(waterMesh);
+        let seed = (cx * 73856093) ^ (cz * 19349663);
 
-            // Wooden/Stone Bridge across river
-            const bridgeGroup = new THREE.Group();
-            const plankMat = new THREE.MeshStandardMaterial({ color: theme.bridge, roughness: 0.8 });
-            for (let p = -8; p <= 8; p += 1.2) {
-                const plankGeo = new THREE.BoxGeometry(7, 0.25, 1);
-                const plank = new THREE.Mesh(plankGeo, plankMat);
-                plank.position.set(0, 0.2, p);
-                plank.castShadow = true;
-                plank.receiveShadow = true;
-                bridgeGroup.add(plank);
+        // 1. CITY & HOUSES (Thành phố, Nhà cửa, Đèn đường)
+        seed++;
+        if (seededRandom(seed) > 0.4) {
+            const isCityChunk = (Math.abs(cx + cz) % 4 === 0);
+            const buildingCount = isCityChunk ? (3 + Math.floor(seededRandom(seed+1)*3)) : (2 + Math.floor(seededRandom(seed+1)*2));
+
+            for (let b = 0; b < buildingCount; b++) {
+                seed++;
+                const bx = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 24);
+                seed++;
+                const bz = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 24);
+
+                const buildingGroup = new THREE.Group();
+                if (isCityChunk) {
+                    // Modern City Skyscrapers
+                    const height = 14 + seededRandom(seed+2) * 22;
+                    const w = 6 + seededRandom(seed+3) * 5;
+                    const d = 6 + seededRandom(seed+4) * 5;
+
+                    const bodyGeo = new THREE.BoxGeometry(w, height, d);
+                    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.4 });
+                    const body = new THREE.Mesh(bodyGeo, bodyMat);
+                    body.position.y = height / 2;
+                    body.castShadow = true; body.receiveShadow = true;
+                    buildingGroup.add(body);
+
+                    // Glowing Windows
+                    const winMat = new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0xfde047, emissiveIntensity: 0.8 });
+                    for (let wy = 3; wy < height - 2; wy += 3.5) {
+                        const win = new THREE.Mesh(new THREE.BoxGeometry(w + 0.1, 1.2, d + 0.1), winMat);
+                        win.position.y = wy;
+                        buildingGroup.add(win);
+                    }
+                } else {
+                    // Suburban Houses with tiled roofs & doors
+                    const houseBodyGeo = new THREE.BoxGeometry(5.5, 3.2, 4.5);
+                    const houseBodyMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.8 });
+                    const houseBody = new THREE.Mesh(houseBodyGeo, houseBodyMat);
+                    houseBody.position.y = 1.6;
+                    houseBody.castShadow = true;
+
+                    const roofGeo = new THREE.ConeGeometry(4.2, 2.2, 4);
+                    const roofMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.6 });
+                    const roof = new THREE.Mesh(roofGeo, roofMat);
+                    roof.rotation.y = Math.PI / 4;
+                    roof.position.y = 4.2;
+                    roof.castShadow = true;
+
+                    const door = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.2), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+                    door.position.set(0, 0.9, 2.3);
+
+                    buildingGroup.add(houseBody, roof, door);
+                }
+
+                buildingGroup.position.set(bx, 0, bz);
+                chunkGroup.add(buildingGroup);
             }
-            bridgeGroup.position.set(originX, 0, originZ);
-            chunkGroup.add(bridgeGroup);
         }
 
-        // Trees Generation (12-16 per chunk)
-        let seed = (cx * 73856093) ^ (cz * 19349663);
-        for (let i = 0; i < 14; i++) {
-            seed++;
-            const rx = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
-            seed++;
-            let rz = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
-            if (hasRiver && Math.abs(rz) < 10) rz += (rz > 0 ? 12 : -12);
+        // 2. RAILWAY TRACKS & MOVING TRAIN (Đường rẫy & Tàu hỏa)
+        if (Math.abs(cz) % 5 === 0) {
+            const railGroup = new THREE.Group();
+            const railMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.2 });
+            const sleeperMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.9 });
 
-            const tx = originX + rx;
-            const tz = originZ + rz;
+            // Metallic rails across X axis
+            const railL = new THREE.Mesh(new THREE.BoxGeometry(CHUNK_SIZE, 0.15, 0.2), railMat);
+            const railR = railL.clone();
+            railL.position.set(originX, 0.12, originZ - 1.2);
+            railR.position.set(originX, 0.12, originZ + 1.2);
+            railGroup.add(railL, railR);
+
+            // Wooden sleepers
+            for (let s = -CHUNK_SIZE/2 + 2; s < CHUNK_SIZE/2; s += 3) {
+                const sleeper = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 3.2), sleeperMat);
+                sleeper.position.set(originX + s, 0.06, originZ);
+                railGroup.add(sleeper);
+            }
+            chunkGroup.add(railGroup);
+
+            // Spawn Moving 3D Train along tracks
+            seed++;
+            if (seededRandom(seed) > 0.4) {
+                const trainGroup = new THREE.Group();
+                const engineGeo = new THREE.BoxGeometry(6, 2.8, 2.6);
+                const engineMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3, metalness: 0.5 });
+                const engine = new THREE.Mesh(engineGeo, engineMat);
+                engine.position.y = 1.5; engine.castShadow = true;
+                trainGroup.add(engine);
+
+                // Chimney
+                const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.2, 8), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+                chimney.position.set(2, 3.2, 0); trainGroup.add(chimney);
+
+                // Headlight
+                const headlight = new THREE.PointLight(0xfde047, 2, 20);
+                headlight.position.set(3.2, 1.6, 0); trainGroup.add(headlight);
+
+                // Passenger Cars
+                for (let c = 1; c <= 3; c++) {
+                    const carGeo = new THREE.BoxGeometry(5.2, 2.4, 2.4);
+                    const carMat = new THREE.MeshStandardMaterial({ color: (c % 2 === 0) ? 0x0284c7 : 0x16a34a });
+                    const car = new THREE.Mesh(carGeo, carMat);
+                    car.position.set(-c * 6.2, 1.3, 0); car.castShadow = true;
+                    trainGroup.add(car);
+                }
+
+                trainGroup.position.set(originX - CHUNK_SIZE/2 + seededRandom(seed+1)*CHUNK_SIZE, 0, originZ);
+                trainGroup.userData = { speed: 0.22 + seededRandom(seed+2)*0.18, trackZ: originZ, originX: originX };
+                scene.add(trainGroup);
+                activeTrains.push(trainGroup);
+            }
+        }
+
+        // 3. OCEAN, BEACH & SEA SHIPS (Tàu biển, Biển & Bãi biển)
+        const isSeaChunk = (Math.abs(cx) % 4 === 0 && cz < -CHUNK_SIZE);
+        if (isSeaChunk) {
+            // Large Sea Plane
+            const seaGeo = new THREE.PlaneGeometry(CHUNK_SIZE, CHUNK_SIZE);
+            const seaMat = new THREE.MeshStandardMaterial({
+                color: theme.water, roughness: 0.1, metalness: 0.5, transparent: true, opacity: 0.92,
+                emissive: theme.emissiveWater, emissiveIntensity: theme.emissiveIntensity
+            });
+            const sea = new THREE.Mesh(seaGeo, seaMat);
+            sea.rotation.x = -Math.PI / 2; sea.position.set(originX, 0.05, originZ);
+            chunkGroup.add(sea);
+
+            // Sandy Beach
+            const beachGeo = new THREE.PlaneGeometry(CHUNK_SIZE, 14);
+            const beachMat = new THREE.MeshStandardMaterial({ color: 0xfde047, roughness: 0.9 });
+            const beach = new THREE.Mesh(beachGeo, beachMat);
+            beach.rotation.x = -Math.PI / 2; beach.position.set(originX, 0.08, originZ + CHUNK_SIZE/2 - 7);
+            chunkGroup.add(beach);
+
+            // Palm Trees on Beach
+            for (let p = 0; p < 4; p++) {
+                seed++;
+                const px = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 10);
+                const pz = originZ + CHUNK_SIZE/2 - 7 + (seededRandom(seed+1) - 0.5) * 6;
+
+                const palmGroup = new THREE.Group();
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.35, 3.5, 8), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+                trunk.position.y = 1.75;
+                const leaves = new THREE.Mesh(new THREE.SphereGeometry(1.6, 8, 6), new THREE.MeshStandardMaterial({ color: 0x15803d }));
+                leaves.scale.set(1.5, 0.4, 1.5); leaves.position.y = 3.5;
+                palmGroup.add(trunk, leaves);
+                palmGroup.position.set(px, 0, pz);
+                chunkGroup.add(palmGroup);
+            }
+
+            // Animated Sea Ship / Boat
+            seed++;
+            if (seededRandom(seed) > 0.3) {
+                const shipGroup = new THREE.Group();
+                const hullGeo = new THREE.BoxGeometry(8, 2.2, 3.2);
+                const hullMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
+                const hull = new THREE.Mesh(hullGeo, hullMat);
+                hull.position.y = 1.1; hull.castShadow = true;
+                shipGroup.add(hull);
+
+                const cabin = new THREE.Mesh(new THREE.BoxGeometry(3.5, 2.0, 2.4), new THREE.MeshStandardMaterial({ color: 0xf8fafc }));
+                cabin.position.set(-1, 2.8, 0); shipGroup.add(cabin);
+
+                shipGroup.position.set(originX + (seededRandom(seed+1)-0.5)*(CHUNK_SIZE-20), 0.1, originZ + (seededRandom(seed+2)-0.5)*(CHUNK_SIZE-20));
+                shipGroup.userData = { bobOffset: Math.random()*Math.PI*2, speedX: (Math.random()-0.5)*0.08 };
+                scene.add(shipGroup);
+                activeShips.push(shipGroup);
+            }
+        }
+
+        // 4. LAKES, PONDS & WATERFALLS (Hồ ao & Cây xanh)
+        seed++;
+        if (!isSeaChunk && seededRandom(seed) > 0.5) {
+            const pondRadius = 6 + seededRandom(seed+1) * 8;
+            const pondGeo = new THREE.CircleGeometry(pondRadius, 24);
+            const pondMat = new THREE.MeshStandardMaterial({
+                color: theme.water, roughness: 0.15, metalness: 0.3, transparent: true, opacity: 0.9,
+                emissive: theme.emissiveWater, emissiveIntensity: theme.emissiveIntensity
+            });
+            const pond = new THREE.Mesh(pondGeo, pondMat);
+            pond.rotation.x = -Math.PI / 2;
+            const pondX = originX + (seededRandom(seed+2) - 0.5) * (CHUNK_SIZE - 20);
+            const pondZ = originZ + (seededRandom(seed+3) - 0.5) * (CHUNK_SIZE - 20);
+            pond.position.set(pondX, 0.06, pondZ);
+            chunkGroup.add(pond);
+
+            // Lilypads on pond
+            for (let l = 0; l < 3; l++) {
+                seed++;
+                const pad = new THREE.Mesh(new THREE.CircleGeometry(0.6 + seededRandom(seed)*0.4, 8), new THREE.MeshStandardMaterial({ color: 0x22c55e }));
+                pad.rotation.x = -Math.PI / 2;
+                pad.position.set(pondX + (seededRandom(seed+1)-0.5)*(pondRadius*0.8), 0.08, pondZ + (seededRandom(seed+2)-0.5)*(pondRadius*0.8));
+                chunkGroup.add(pad);
+            }
+        }
+
+        // 5. TREES & ROCKS GENERATION
+        for (let t = 0; t < 10; t++) {
+            seed++;
+            const tx = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
+            seed++;
+            const tz = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
 
             const treeGroup = new THREE.Group();
-            const trunkGeo = new THREE.CylinderGeometry(0.4, 0.6, 3, 8);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: theme.treeTrunk, roughness: 0.9 });
-            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-            trunk.position.y = 1.5;
-            trunk.castShadow = true;
-            treeGroup.add(trunk);
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 2.8, 8), new THREE.MeshStandardMaterial({ color: theme.treeTrunk, roughness: 0.9 }));
+            trunk.position.y = 1.4; trunk.castShadow = true;
 
-            const foliageMat = new THREE.MeshStandardMaterial({ color: theme.treeLeaf, roughness: 0.5 });
-            const f1Geo = new THREE.ConeGeometry(2.2, 3.2, 8);
-            const f1 = new THREE.Mesh(f1Geo, foliageMat);
-            f1.position.y = 3.5;
-            f1.castShadow = true;
-            const f2 = new THREE.Mesh(f1Geo, foliageMat);
-            f2.position.y = 4.8;
-            f2.scale.set(0.78, 0.78, 0.78);
-            f2.castShadow = true;
-            treeGroup.add(f1); treeGroup.add(f2);
+            const foliage = new THREE.Mesh(new THREE.ConeGeometry(2.0, 3.2, 8), new THREE.MeshStandardMaterial({ color: theme.treeLeaf, roughness: 0.6 }));
+            foliage.position.y = 3.2; foliage.castShadow = true;
+
+            treeGroup.add(trunk, foliage);
             treeGroup.position.set(tx, 0, tz);
             chunkGroup.add(treeGroup);
         }
 
-        // Rocks / Crystals Generation (8-12 per chunk)
-        for (let i = 0; i < 10; i++) {
-            seed++;
-            const rx = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 10);
-            seed++;
-            const rz = (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 10);
-
-            const rockGeo = new THREE.DodecahedronGeometry(0.8 + seededRandom(seed)*0.6, 1);
-            const rockMat = new THREE.MeshStandardMaterial({ color: theme.rock, roughness: 0.8 });
-            const rock = new THREE.Mesh(rockGeo, rockMat);
-            rock.rotation.set(seededRandom(seed*2), seededRandom(seed*3), seededRandom(seed*4));
-            rock.position.set(originX + rx, 0.4, originZ + rz);
-            rock.castShadow = true;
-            rock.receiveShadow = true;
-            chunkGroup.add(rock);
-        }
-
-        // Spawn Wildlife Animals
+        // Spawn Animals
         spawnAnimalsInChunk(cx, cz, chunkGroup, mapKey, seed);
 
         return chunkGroup;
     }
 
-    // SPAWN WILDLIFE ANIMALS PER MAP THEME
+    // SPAWN WILDLIFE ANIMALS
     function spawnAnimalsInChunk(cx, cz, chunkGroup, mapKey, seedBase) {
         const originX = cx * CHUNK_SIZE;
         const originZ = cz * CHUNK_SIZE;
-        const chunkKey = `${cx},${cz}`;
-        let seed = seedBase + 9999;
-        const count = 4;
+        let seed = seedBase + 555;
 
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < 3; i++) {
             seed++;
             const ax = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 16);
             seed++;
             const az = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 16);
-            seed++;
-            const animalType = Math.floor(seededRandom(seed) * 3);
 
             let animalGroup = new THREE.Group();
-            let animalSpeed = 0.018 + seededRandom(seed + 1) * 0.022;
-            let bobOffset = seededRandom(seed + 2) * Math.PI * 2;
+            const matR = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.6 });
+            const body = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 10), matR);
+            body.position.y = 0.38; body.castShadow = true;
+            animalGroup.add(body);
 
-            if (mapKey === 'park') {
-                if (animalType === 0) { // 🐇 Rabbit
-                    const matW = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, roughness: 0.6 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 10), matW);
-                    body.position.y = 0.38; body.castShadow = true;
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 10), matW);
-                    head.position.set(0, 0.72, 0.2); head.castShadow = true;
-                    const earGeo = new THREE.CylinderGeometry(0.06, 0.04, 0.42, 6);
-                    const earL = new THREE.Mesh(earGeo, new THREE.MeshStandardMaterial({ color: 0xf9c0c0 }));
-                    earL.position.set(-0.1, 1.05, 0.18); earL.rotation.z = 0.12;
-                    const earR = new THREE.Mesh(earGeo, new THREE.MeshStandardMaterial({ color: 0xf9c0c0 }));
-                    earR.position.set(0.1, 1.05, 0.18); earR.rotation.z = -0.12;
-                    const eyeM = new THREE.MeshBasicMaterial({ color: 0x220000 });
-                    const eyeL2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeM);
-                    eyeL2.position.set(-0.12, 0.76, 0.4);
-                    const eyeR2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeM);
-                    eyeR2.position.set(0.12, 0.76, 0.4);
-                    animalGroup.add(body, head, earL, earR, eyeL2, eyeR2);
-                    animalGroup.userData.animalName = 'rabbit';
-                } else if (animalType === 1) { // 🐸 Frog
-                    const matG = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.5 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 12, 8), matG);
-                    body.position.y = 0.28; body.scale.y = 0.7;
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.32, 10, 8), matG);
-                    head.position.set(0, 0.62, 0.22);
-                    const eyeGeo = new THREE.SphereGeometry(0.12, 8, 8);
-                    const eyeM = new THREE.MeshStandardMaterial({ color: 0xfbbf24 });
-                    const eyeL = new THREE.Mesh(eyeGeo, eyeM); eyeL.position.set(-0.2, 0.88, 0.28);
-                    const eyeR = new THREE.Mesh(eyeGeo, eyeM); eyeR.position.set(0.2, 0.88, 0.28);
-                    const pupilM = new THREE.MeshBasicMaterial({ color: 0x000000 });
-                    const pupL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), pupilM); pupL.position.set(-0.2, 0.88, 0.38);
-                    const pupR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), pupilM); pupR.position.set(0.2, 0.88, 0.38);
-                    animalGroup.add(body, head, eyeL, eyeR, pupL, pupR);
-                    animalGroup.userData.animalName = 'frog';
-                    animalSpeed *= 0.6;
-                } else { // 🦋 Butterfly
-                    const wingM = new THREE.MeshStandardMaterial({ color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
-                    const wingGeo = new THREE.SphereGeometry(0.38, 8, 6);
-                    const wL = new THREE.Mesh(wingGeo, wingM); wL.scale.set(1, 0.08, 1.4); wL.position.set(-0.35, 0, 0);
-                    const wR = new THREE.Mesh(wingGeo, wingM); wR.scale.set(1, 0.08, 1.4); wR.position.set(0.35, 0, 0);
-                    const body2 = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
-                    animalGroup.add(wL, wR, body2);
-                    animalGroup.userData.animalName = 'butterfly';
-                    animalGroup.userData.flying = true;
-                    animalSpeed *= 1.5;
-                }
-
-            } else if (mapKey === 'volcano') {
-                if (animalType === 0) { // 🦎 Fire Lizard
-                    const matR = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.4 });
-                    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.28, 0.9, 8), matR); body.rotation.z = Math.PI / 2; body.position.y = 0.22;
-                    const head = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.36), matR); head.position.set(0.58, 0.22, 0);
-                    const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.02, 0.7, 6), matR); tail.rotation.z = Math.PI / 2; tail.position.set(-0.75, 0.22, 0);
-                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeM); eyeL.position.set(0.62, 0.36, 0.14);
-                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 6), eyeM); eyeR.position.set(0.62, 0.36, -0.14);
-                    animalGroup.add(body, head, tail, eyeL, eyeR);
-                    animalGroup.userData.animalName = 'lizard';
-                } else if (animalType === 1) { // 🦀 Lava Crab
-                    const matC = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.6 });
-                    const shell = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 8), matC); shell.scale.y = 0.55; shell.position.y = 0.22;
-                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-                    for (let li = -1; li <= 1; li += 2) {
-                        const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5), matC);
-                        leg1.rotation.z = Math.PI / 2 + 0.4 * li; leg1.position.set(0.5 * li, 0.18, 0.12);
-                        const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 5), matC);
-                        leg2.rotation.z = Math.PI / 2 + 0.4 * li; leg2.position.set(0.5 * li, 0.18, -0.12);
-                        animalGroup.add(leg1, leg2);
-                    }
-                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeL.position.set(-0.18, 0.44, 0.3);
-                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeR.position.set(0.18, 0.44, 0.3);
-                    animalGroup.add(shell, eyeL, eyeR);
-                    animalGroup.userData.animalName = 'crab';
-                    animalSpeed *= 0.7;
-                } else { // 🦇 Bat
-                    const matD = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.7 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matD); body.position.y = 0;
-                    const wingL = new THREE.Mesh(new THREE.SphereGeometry(0.35, 6, 5), new THREE.MeshStandardMaterial({ color: 0x374151, transparent: true, opacity: 0.8, side: THREE.DoubleSide }));
-                    wingL.scale.set(1, 0.06, 1.2); wingL.position.set(-0.42, 0, 0);
-                    const wingR = wingL.clone(); wingR.position.set(0.42, 0, 0);
-                    const earL = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.18, 5), matD); earL.position.set(-0.12, 0.28, 0);
-                    const earR = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.18, 5), matD); earR.position.set(0.12, 0.28, 0);
-                    animalGroup.add(body, wingL, wingR, earL, earR);
-                    animalGroup.userData.animalName = 'bat';
-                    animalGroup.userData.flying = true;
-                    animalSpeed *= 2.2;
-                }
-
-            } else if (mapKey === 'snow') {
-                if (animalType === 0) { // 🐧 Penguin
-                    const matB = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.5 });
-                    const matW = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.5 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.42, 10, 10), matB); body.scale.y = 1.3; body.position.y = 0.5;
-                    const belly = new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 8), matW); belly.scale.y = 1.2; belly.position.set(0, 0.5, 0.3);
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 10), matB); head.position.set(0, 1.08, 0);
-                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 5), new THREE.MeshStandardMaterial({ color: 0xf97316 })); beak.rotation.x = Math.PI / 2; beak.position.set(0, 1.06, 0.3);
-                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xffffff });
-                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeL.position.set(-0.14, 1.14, 0.24);
-                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeM); eyeR.position.set(0.14, 1.14, 0.24);
-                    animalGroup.add(body, belly, head, beak, eyeL, eyeR);
-                    animalGroup.userData.animalName = 'penguin';
-                    animalSpeed *= 0.7;
-                } else if (animalType === 1) { // 🐻‍❄️ Polar Bear
-                    const matW = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.8 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.65, 10, 10), matW); body.position.y = 0.62;
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 10, 10), matW); head.position.set(0, 1.3, 0.45);
-                    const earL = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), matW); earL.position.set(-0.28, 1.68, 0.42);
-                    const earR = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 8), matW); earR.position.set(0.28, 1.68, 0.42);
-                    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), new THREE.MeshStandardMaterial({ color: 0x1e293b })); nose.position.set(0, 1.22, 0.83);
-                    animalGroup.add(body, head, earL, earR, nose);
-                    animalGroup.userData.animalName = 'polarbear';
-                    animalSpeed *= 0.5;
-                } else { // 🦉 Snow Owl
-                    const matW = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.6 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.38, 8, 10), matW); body.scale.y = 1.3; body.position.y = 0.48;
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), matW); head.position.set(0, 1.02, 0);
-                    const beak = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.14, 4), new THREE.MeshStandardMaterial({ color: 0xf97316 })); beak.rotation.x = Math.PI / 2; beak.position.set(0, 0.96, 0.3);
-                    const eyeM = new THREE.MeshBasicMaterial({ color: 0xfbbf24 });
-                    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), eyeM); eyeL.position.set(-0.15, 1.08, 0.24);
-                    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 6), eyeM); eyeR.position.set(0.15, 1.08, 0.24);
-                    animalGroup.add(body, head, beak, eyeL, eyeR);
-                    animalGroup.userData.animalName = 'owl';
-                    animalGroup.userData.flying = true;
-                    animalSpeed *= 1.2;
-                }
-
-            } else if (mapKey === 'galaxy') {
-                if (animalType === 0) { // 👾 Alien Jellyfish
-                    const matJ = new THREE.MeshStandardMaterial({ color: 0xc084fc, roughness: 0.1, metalness: 0.4, transparent: true, opacity: 0.8, emissive: 0xc084fc, emissiveIntensity: 0.5 });
-                    const dome = new THREE.Mesh(new THREE.SphereGeometry(0.44, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), matJ); dome.position.y = 0.22;
-                    for (let ti = 0; ti < 6; ti++) {
-                        const tentGeo = new THREE.CylinderGeometry(0.03, 0.01, 0.55 + Math.random() * 0.3, 5);
-                        const tent = new THREE.Mesh(tentGeo, matJ);
-                        const ang = (ti / 6) * Math.PI * 2;
-                        tent.position.set(Math.cos(ang) * 0.28, -0.12, Math.sin(ang) * 0.28);
-                        animalGroup.add(tent);
-                    }
-                    animalGroup.add(dome);
-                    animalGroup.userData.animalName = 'jellyfish';
-                    animalGroup.userData.flying = true;
-                    animalSpeed *= 0.8;
-                } else if (animalType === 1) { // 🦌 Crystal Deer
-                    const matC = new THREE.MeshStandardMaterial({ color: 0x818cf8, roughness: 0.1, metalness: 0.8, emissive: 0x818cf8, emissiveIntensity: 0.3 });
-                    const body = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), matC); body.scale.set(1.4, 0.9, 0.9); body.position.y = 0.65;
-                    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.18, 0.4, 6), matC); neck.position.set(0, 1.05, 0.3); neck.rotation.x = -0.4;
-                    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), matC); head.position.set(0, 1.36, 0.52);
-                    const antlerGeo = new THREE.CylinderGeometry(0.03, 0.05, 0.38, 4);
-                    const antL = new THREE.Mesh(antlerGeo, matC); antL.position.set(-0.14, 1.64, 0.5); antL.rotation.z = 0.3;
-                    const antR = new THREE.Mesh(antlerGeo, matC); antR.position.set(0.14, 1.64, 0.5); antR.rotation.z = -0.3;
-                    const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg1.position.set(-0.22, 0.26, 0.18);
-                    const leg2 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg2.position.set(0.22, 0.26, 0.18);
-                    const leg3 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg3.position.set(-0.22, 0.26, -0.18);
-                    const leg4 = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.05, 0.55, 5), matC); leg4.position.set(0.22, 0.26, -0.18);
-                    animalGroup.add(body, neck, head, antL, antR, leg1, leg2, leg3, leg4);
-                    animalGroup.userData.animalName = 'crystal_deer';
-                } else { // ✨ Space Firefly
-                    const matF = new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 1.2, roughness: 0.1 });
-                    const orb = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), matF);
-                    const trail1 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.6, transparent: true, opacity: 0.6 })); trail1.position.z = -0.24;
-                    const trail2 = new THREE.Mesh(new THREE.SphereGeometry(0.05, 5, 5), new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.3, transparent: true, opacity: 0.35 })); trail2.position.z = -0.42;
-                    animalGroup.add(orb, trail1, trail2);
-                    animalGroup.userData.animalName = 'firefly';
-                    animalGroup.userData.flying = true;
-                    animalSpeed *= 2.5;
-                }
-            }
-
-            animalGroup.position.set(ax, animalGroup.userData.flying ? (1.2 + seededRandom(seed) * 2.5) : 0, az);
-            animalGroup.userData.chunkKey = chunkKey;
-            animalGroup.userData.wanderAngle = seededRandom(seed + 5) * Math.PI * 2;
-            animalGroup.userData.wanderTimer = seededRandom(seed + 6) * 120;
-            animalGroup.userData.speed = animalSpeed;
-            animalGroup.userData.bobOffset = seededRandom(seed + 7) * Math.PI * 2;
-            animalGroup.castShadow = true;
+            animalGroup.position.set(ax, 0, az);
+            animalGroup.userData = { wanderAngle: Math.random()*Math.PI*2, speed: 0.02 + Math.random()*0.02, chunkKey: `${cx},${cz}` };
             chunkGroup.add(animalGroup);
             activeAnimals.push(animalGroup);
         }
     }
 
-    // DYNAMIC MAP CHUNK UPDATER ("Đi tới đâu load tới đó")
     function updateWorldChunksAroundPlayer(px, pz) {
         const currentChunkX = Math.floor((px + CHUNK_SIZE / 2) / CHUNK_SIZE);
         const currentChunkZ = Math.floor((pz + CHUNK_SIZE / 2) / CHUNK_SIZE);
@@ -1008,27 +1091,19 @@ if (isset($pdo)) {
             }
         }
 
-        // Remove distant chunks out of render radius + cleanup their animals
         for (const [key, group] of activeChunks.entries()) {
             if (!neededKeys.has(key)) {
                 scene.remove(group);
                 activeChunks.delete(key);
-                // Remove animals belonging to this chunk
-                for (let ai = activeAnimals.length - 1; ai >= 0; ai--) {
-                    if (activeAnimals[ai].userData.chunkKey === key) {
-                        activeAnimals.splice(ai, 1);
-                    }
-                }
             }
         }
 
-        // Update HUD Chunk Coordinate & Distance
         const distExplored = Math.floor(Math.sqrt(px*px + pz*pz));
         document.getElementById('dist-val').innerText = distExplored + 'm';
         document.getElementById('chunk-val').innerText = `[${currentChunkX}, ${currentChunkZ}]`;
     }
 
-    // DUCK CHARACTER BUILDER (Golden, Cool, King, Fairy, Ninja)
+    // DUCK CHARACTER BUILDER
     function create3DDuck(skinKey) {
         if (duckGroup) scene.remove(duckGroup);
         duckGroup = new THREE.Group();
@@ -1036,143 +1111,57 @@ if (isset($pdo)) {
         let bodyColor = 0xffd43b;
         let beakColor = 0xf97316;
 
-        if (skinKey === 'cool') {
-            bodyColor = 0xf97316; // Neon Orange Duck
-        } else if (skinKey === 'king') {
-            bodyColor = 0x0284c7; // Royal Blue Duck
-        } else if (skinKey === 'fairy') {
-            bodyColor = 0xf472b6; // Sweet Pink Duck
-        } else if (skinKey === 'ninja') {
-            bodyColor = 0x334155; // Shadow Ninja Duck
-            beakColor = 0xe2e8f0;
-        }
+        if (skinKey === 'cool') bodyColor = 0xf97316;
+        else if (skinKey === 'king') bodyColor = 0x0284c7;
+        else if (skinKey === 'fairy') bodyColor = 0xf472b6;
+        else if (skinKey === 'ninja') { bodyColor = 0x334155; beakColor = 0xe2e8f0; }
 
-        // Body
         const bodyGeo = new THREE.SphereGeometry(1.2, 24, 24);
         const duckMat = new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.3, metalness: 0.1 });
         duckBody = new THREE.Mesh(bodyGeo, duckMat); duckBody.position.y = 1.2; duckBody.castShadow = true;
         duckGroup.add(duckBody);
 
-        // Head
         const headGeo = new THREE.SphereGeometry(0.85, 20, 20);
         duckHead = new THREE.Mesh(headGeo, duckMat); duckHead.position.set(0, 2.2, 0.3); duckHead.castShadow = true;
         duckGroup.add(duckHead);
 
-        // Beak
         const beakGeo = new THREE.BoxGeometry(0.5, 0.22, 0.5);
         const beakMat = new THREE.MeshStandardMaterial({ color: beakColor, roughness: 0.4 });
         duckBeak = new THREE.Mesh(beakGeo, beakMat); duckBeak.position.set(0, 2.1, 1.1);
         duckGroup.add(duckBeak);
 
-        // Eyes
         const eyeGeo = new THREE.SphereGeometry(0.12, 12, 12);
         const eyeMat = new THREE.MeshBasicMaterial({ color: 0x0f172a });
         const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.35, 2.4, 0.95);
         const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set(0.35, 2.4, 0.95);
-        duckGroup.add(eyeL); duckGroup.add(eyeR);
+        duckGroup.add(eyeL, eyeR);
 
-        // Wings
         const wingGeo = new THREE.BoxGeometry(0.2, 0.7, 0.9);
         duckWingL = new THREE.Mesh(wingGeo, duckMat); duckWingL.position.set(-1.2, 1.3, 0);
         duckWingR = new THREE.Mesh(wingGeo, duckMat); duckWingR.position.set(1.2, 1.3, 0);
-        duckGroup.add(duckWingL); duckGroup.add(duckWingR);
-
-        // UNIQUE ACCESORIES FOR SKINS
-        if (skinKey === 'cool') { // 🕶️ Sunglasses
-            const glassGeo = new THREE.BoxGeometry(0.9, 0.25, 0.15);
-            const glassMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.1, metalness: 0.9 });
-            const glasses = new THREE.Mesh(glassGeo, glassMat); glasses.position.set(0, 2.4, 1.05);
-            duckGroup.add(glasses);
-        } else if (skinKey === 'king') { // 👑 Golden Crown
-            const crownGeo = new THREE.CylinderGeometry(0.45, 0.35, 0.4, 8);
-            const crownMat = new THREE.MeshStandardMaterial({ color: 0xeab308, metalness: 0.8, roughness: 0.2 });
-            const crown = new THREE.Mesh(crownGeo, crownMat); crown.position.set(0, 3.15, 0.3);
-            duckGroup.add(crown);
-        } else if (skinKey === 'fairy') { // 🌸 Flower Crown
-            const flowerGeo = new THREE.TorusGeometry(0.5, 0.1, 8, 16);
-            const flowerMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e });
-            const flower = new THREE.Mesh(flowerGeo, flowerMat); flower.rotation.x = Math.PI/2; flower.position.set(0, 2.9, 0.3);
-            duckGroup.add(flower);
-        } else if (skinKey === 'ninja') { // 🥷 Red Headband
-            const bandGeo = new THREE.CylinderGeometry(0.86, 0.86, 0.2, 16);
-            const bandMat = new THREE.MeshStandardMaterial({ color: 0xdc2626 });
-            const band = new THREE.Mesh(bandGeo, bandMat); band.position.set(0, 2.45, 0.3);
-            duckGroup.add(band);
-        } else { // 🐥 Red Bowtie
-            const bowGeo = new THREE.ConeGeometry(0.25, 0.4, 4);
-            const bowMat = new THREE.MeshStandardMaterial({ color: 0xe11d48 });
-            const bowL = new THREE.Mesh(bowGeo, bowMat); bowL.rotation.z = Math.PI / 2; bowL.position.set(-0.25, 1.7, 0.95);
-            const bowR = new THREE.Mesh(bowGeo, bowMat); bowR.rotation.z = -Math.PI / 2; bowR.position.set(0.25, 1.7, 0.95);
-            duckGroup.add(bowL); duckGroup.add(bowR);
-        }
+        duckGroup.add(duckWingL, duckWingR);
 
         duckGroup.position.set(0, 0, 0);
         scene.add(duckGroup);
     }
 
-    // SPAWN & MAINTAIN DYNAMIC FRUITS & DRINKS AROUND PLAYER
+    // FRUITS SPANWER
     function maintainFruitsAroundPlayer(px, pz) {
-        // Remove foods that are too far (> 220m from player)
         for (let i = foods.length - 1; i >= 0; i--) {
             const food = foods[i];
             const dist = Math.sqrt((food.position.x - px)**2 + (food.position.z - pz)**2);
-            if (dist > 230) {
+            if (dist > 220) {
                 scene.remove(food);
                 foods.splice(i, 1);
             }
         }
 
-        // Spawn items to maintain 40 active items near player
         while (foods.length < 40) {
-            const type = Math.floor(Math.random() * 6);
             let itemGroup = new THREE.Group();
-            let points = 15;
-
-            if (type === 0) { // 🍎 Red Apple
-                const appleGeo = new THREE.SphereGeometry(0.6, 16, 16);
-                const appleMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.2 });
-                const apple = new THREE.Mesh(appleGeo, appleMat); apple.position.y = 0.6; apple.castShadow = true;
-                itemGroup.add(apple);
-                const leafGeo = new THREE.BoxGeometry(0.3, 0.05, 0.15);
-                const leafMat = new THREE.MeshBasicMaterial({ color: 0x16a34a });
-                const leaf = new THREE.Mesh(leafGeo, leafMat); leaf.position.set(0.15, 1.15, 0);
-                itemGroup.add(leaf);
-                points = 15;
-            } else if (type === 1) { // 🍊 Orange
-                const orangeGeo = new THREE.SphereGeometry(0.55, 16, 16);
-                const orangeMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.4 });
-                const orange = new THREE.Mesh(orangeGeo, orangeMat); orange.position.y = 0.55; orange.castShadow = true;
-                itemGroup.add(orange);
-                points = 15;
-            } else if (type === 2) { // 🍉 Watermelon Slice
-                const melonGeo = new THREE.CylinderGeometry(0.7, 0.7, 0.3, 12, 1, false, 0, Math.PI);
-                const melonMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.5 });
-                const melon = new THREE.Mesh(melonGeo, melonMat); melon.rotation.z = Math.PI/2; melon.position.y = 0.7; melon.castShadow = true;
-                itemGroup.add(melon);
-                const fleshGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.31, 12, 1, false, 0, Math.PI);
-                const fleshMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.3 });
-                const flesh = new THREE.Mesh(fleshGeo, fleshMat); flesh.rotation.z = Math.PI/2; flesh.position.y = 0.7;
-                itemGroup.add(flesh);
-                points = 25;
-            } else if (type === 3) { // 🍓 Strawberry
-                const strawGeo = new THREE.ConeGeometry(0.5, 0.8, 12);
-                const strawMat = new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.3 });
-                const straw = new THREE.Mesh(strawGeo, strawMat); straw.rotation.x = Math.PI; straw.position.y = 0.7; straw.castShadow = true;
-                itemGroup.add(straw);
-                points = 20;
-            } else if (type === 4) { // 🍌 Banana
-                const bananaGeo = new THREE.TorusGeometry(0.5, 0.14, 8, 16, Math.PI * 0.8);
-                const bananaMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.3 });
-                const banana = new THREE.Mesh(bananaGeo, bananaMat); banana.position.y = 0.6; banana.castShadow = true;
-                itemGroup.add(banana);
-                points = 15;
-            } else { // 🧋 Boba Milk Tea
-                const cupGeo = new THREE.CylinderGeometry(0.5, 0.38, 1.2, 16);
-                const cupMat = new THREE.MeshStandardMaterial({ color: 0xf5a623, roughness: 0.2, transparent: true, opacity: 0.9 });
-                const cup = new THREE.Mesh(cupGeo, cupMat); cup.position.y = 0.6; cup.castShadow = true;
-                itemGroup.add(cup);
-                points = 20;
-            }
+            const appleGeo = new THREE.SphereGeometry(0.6, 16, 16);
+            const appleMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.2 });
+            const apple = new THREE.Mesh(appleGeo, appleMat); apple.position.y = 0.6; apple.castShadow = true;
+            itemGroup.add(apple);
 
             const angle = Math.random() * Math.PI * 2;
             const dist = 12 + Math.random() * 110;
@@ -1180,12 +1169,13 @@ if (isset($pdo)) {
             const fz = pz + Math.sin(angle) * dist;
 
             itemGroup.position.set(fx, 0, fz);
-            itemGroup.userData = { points: points, rotSpeed: 0.02 + Math.random()*0.03, floatOffset: Math.random()*Math.PI*2 };
+            itemGroup.userData = { points: 15, rotSpeed: 0.03, floatOffset: Math.random()*Math.PI*2 };
             scene.add(itemGroup);
             foods.push(itemGroup);
         }
     }
 
+    // MAIN ANIMATION LOOP
     function animate() {
         requestAnimationFrame(animate);
         const time = Date.now() * 0.003;
@@ -1202,12 +1192,28 @@ if (isset($pdo)) {
             }
 
             if (dx !== 0 || dz !== 0) {
-                const speed = 0.32;
-                duckGroup.position.x += dx * speed;
-                duckGroup.position.z += dz * speed;
+                const speed = 0.34;
+                
+                if (isFirstPerson) {
+                    // WASD Movement relative to First Person Yaw Angle
+                    const forwardX = -Math.sin(fpYaw);
+                    const forwardZ = -Math.cos(fpYaw);
+                    const rightX = Math.cos(fpYaw);
+                    const rightZ = -Math.sin(fpYaw);
 
-                const targetAngle = Math.atan2(dx, dz);
-                duckGroup.rotation.y = targetAngle;
+                    const moveX = (forwardX * (-dz) + rightX * dx);
+                    const moveZ = (forwardZ * (-dz) + rightZ * dx);
+
+                    duckGroup.position.x += moveX * speed;
+                    duckGroup.position.z += moveZ * speed;
+                    duckGroup.rotation.y = fpYaw;
+                } else {
+                    duckGroup.position.x += dx * speed;
+                    duckGroup.position.z += dz * speed;
+
+                    const targetAngle = Math.atan2(dx, dz);
+                    duckGroup.rotation.y = targetAngle;
+                }
 
                 duckGroup.position.y = Math.abs(Math.sin(time * 14)) * 0.4;
                 duckWingL.rotation.z = Math.sin(time * 16) * 0.45;
@@ -1217,21 +1223,40 @@ if (isset($pdo)) {
                 duckWingL.rotation.z = 0; duckWingR.rotation.z = 0;
             }
 
-            // Smooth 3D Camera Follow Player Infinitely
-            camera.position.x = THREE.MathUtils.lerp(camera.position.x, duckGroup.position.x, 0.08);
-            camera.position.z = THREE.MathUtils.lerp(camera.position.z, duckGroup.position.z + 28, 0.08);
-            camera.lookAt(duckGroup.position.x, 1, duckGroup.position.z);
+            // CAMERA CONTROLLER: FIRST PERSON VS THIRD PERSON
+            if (isFirstPerson) {
+                // Position Camera inside Duck's Head / Eyes
+                const headPosY = duckGroup.position.y + 2.3;
+                camera.position.set(duckGroup.position.x, headPosY, duckGroup.position.z + 0.3);
 
-            // Light Follows Player for dynamic shadows
-            if (dirLight) {
-                dirLight.position.set(duckGroup.position.x + 30, 45, duckGroup.position.z + 30);
+                // Calculate Look At Direction vector from fpYaw & fpPitch
+                const dirX = Math.sin(fpYaw) * Math.cos(fpPitch);
+                const dirY = Math.sin(fpPitch);
+                const dirZ = Math.cos(fpYaw) * Math.cos(fpPitch);
+
+                camera.lookAt(
+                    camera.position.x - dirX * 10,
+                    camera.position.y + dirY * 10,
+                    camera.position.z - dirZ * 10
+                );
+            } else {
+                // Smooth 3D Orbit Camera Follow
+                camera.position.x = THREE.MathUtils.lerp(camera.position.x, duckGroup.position.x, 0.08);
+                camera.position.z = THREE.MathUtils.lerp(camera.position.z, duckGroup.position.z + 28, 0.08);
+                camera.position.y = THREE.MathUtils.lerp(camera.position.y, duckGroup.position.y + 22, 0.08);
+                camera.lookAt(duckGroup.position.x, 1, duckGroup.position.z);
             }
 
-            // Update Chunks & Food around Player position dynamically ("Đi tới đâu load tới đó")
+            // Sun light follows player position for continuous dynamic shadows
+            if (dirLight) {
+                dirLight.position.set(duckGroup.position.x + 40, 60, duckGroup.position.z + 40);
+            }
+
+            // Update Chunks & Foods dynamically
             updateWorldChunksAroundPlayer(duckGroup.position.x, duckGroup.position.z);
             maintainFruitsAroundPlayer(duckGroup.position.x, duckGroup.position.z);
 
-            // Food collision check
+            // Food Collisions
             for (let i = foods.length - 1; i >= 0; i--) {
                 const food = foods[i];
                 food.rotation.y += food.userData.rotSpeed;
@@ -1249,40 +1274,24 @@ if (isset($pdo)) {
                 }
             }
 
-            // Animate Wildlife Animals
-            for (let ai = 0; ai < activeAnimals.length; ai++) {
-                const a = activeAnimals[ai];
-                const ud = a.userData;
-                ud.wanderTimer--;
-                if (ud.wanderTimer <= 0) {
-                    ud.wanderAngle += (Math.random() - 0.5) * 1.2;
-                    ud.wanderTimer = 80 + Math.random() * 120;
+            // Animate Trains
+            activeTrains.forEach(train => {
+                train.position.x += train.userData.speed;
+                if (train.position.x > train.userData.originX + CHUNK_SIZE) {
+                    train.position.x = train.userData.originX - CHUNK_SIZE;
                 }
-                const spd = ud.speed;
-                a.position.x += Math.cos(ud.wanderAngle) * spd;
-                a.position.z += Math.sin(ud.wanderAngle) * spd;
-                a.rotation.y = ud.wanderAngle + Math.PI / 2;
+            });
 
-                const name = ud.animalName;
-                if (ud.flying) {
-                    a.position.y = (ud.baseY || 1.8) + Math.sin(time * 2.2 + ud.bobOffset) * 0.5;
-                    if (!ud.baseY) ud.baseY = a.position.y;
-                    // Butterfly/bat wing flap
-                    if (name === 'butterfly' && a.children[0]) {
-                        a.children[0].rotation.y = Math.sin(time * 12 + ud.bobOffset) * 0.7;
-                        a.children[1].rotation.y = -Math.sin(time * 12 + ud.bobOffset) * 0.7;
-                    }
-                    if (name === 'bat' && a.children[1]) {
-                        a.children[1].rotation.z = Math.sin(time * 10) * 0.55;
-                        a.children[2].rotation.z = -Math.sin(time * 10) * 0.55;
-                    }
-                } else {
-                    // Ground bobbing / hop
-                    if (name === 'rabbit') a.position.y = Math.abs(Math.sin(time * 7 + ud.bobOffset)) * 0.28;
-                    else if (name === 'penguin') a.position.y = 0; // waddle rotation
-                    else a.position.y = 0;
-                }
-            }
+            // Animate Ships
+            activeShips.forEach(ship => {
+                ship.position.y = 0.1 + Math.sin(time * 2 + ship.userData.bobOffset) * 0.18;
+                ship.position.x += ship.userData.speedX;
+            });
+        }
+
+        // Rotate Weather Particles
+        if (activeParticles) {
+            activeParticles.rotation.y += 0.0008;
         }
 
         renderer.render(scene, camera);
@@ -1301,7 +1310,6 @@ if (isset($pdo)) {
     }
 
     function startGame() {
-        // Rebuild 3D world & duck skin if changed
         rebuildMapEnvironment();
         create3DDuck(currentDuckSkin);
 
@@ -1313,7 +1321,6 @@ if (isset($pdo)) {
         timeLeft = selectedTime;
         gameActive = true;
 
-        // Clear & respawn foods around start
         for (let fi = foods.length - 1; fi >= 0; fi--) {
             scene.remove(foods[fi]);
         }
@@ -1343,6 +1350,8 @@ if (isset($pdo)) {
         gameActive = false;
         clearInterval(timerInterval);
         playQuackSound();
+
+        if (document.exitPointerLock) document.exitPointerLock();
 
         document.getElementById('final-score').innerText = score + ' ĐIỂM';
         const vResult = document.getElementById('voucher-result');

@@ -2,6 +2,24 @@
 require_once __DIR__ . '/../ThanhNgang/header.php';
 
 $cart     = $_SESSION['cart'] ?? [];
+$site_lang = get_site_lang();
+// Refresh product names in cart according to current site language (if product_id present)
+if (!empty($cart)) {
+    foreach ($cart as $k => $it) {
+        if (!empty($it['product_id'])) {
+            $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ? AND status = 1");
+            $stmt->execute([intval($it['product_id'])]);
+            $prod = $stmt->fetch();
+            if ($prod) {
+                $prod = localize_row($prod, $site_lang, ['name','description']);
+                $cart[$k]['name'] = $prod['name'];
+                // update image if product has one
+                if (!empty($prod['image'])) $cart[$k]['image'] = $prod['image'];
+            }
+        }
+    }
+}
+
 $subtotal = array_sum(array_column($cart, 'total_item_amount'));
 $shipping = ($subtotal > 100000 || $subtotal == 0) ? 0 : 15000;
 $total    = $subtotal + $shipping;

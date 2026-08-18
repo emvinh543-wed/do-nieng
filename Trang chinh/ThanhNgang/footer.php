@@ -13,36 +13,36 @@
         </div>
 
         <div>
-            <h4 class="footer-title">Kham Pha</h4>
+            <h4 class="footer-title" data-i18n="footer_title_explore">Kham Pha</h4>
             <ul class="footer-links">
-                <li><a href="/" class="footer-link">Trang chu</a></li>
-                <li><a href="/index/?type=products" class="footer-link">Thuc don do uong</a></li>
-                <li><a href="/contact.php" class="footer-link">Lien he - Gop y</a></li>
-                <li><a href="/amin/admin.php" class="footer-link">Quan tri vien</a></li>
+                <li><a href="/" class="footer-link" data-i18n="footer_links_home">Trang chu</a></li>
+                <li><a href="/index/?type=products" class="footer-link" data-i18n="footer_links_menu">Thuc don do uong</a></li>
+                <li><a href="/contact.php" class="footer-link" data-i18n="footer_links_contact">Lien he - Gop y</a></li>
+                <li><a href="/amin/admin.php" class="footer-link" data-i18n="nav_admin">Quan tri vien</a></li>
             </ul>
         </div>
 
         <div>
-            <h4 class="footer-title">Gio Hoat Dong</h4>
+            <h4 class="footer-title" data-i18n="footer_title_hours">Gio Hoat Dong</h4>
             <ul class="footer-links" style="font-size:0.9rem;">
-                <li>Thu 2 - Thu 6: 07:00 - 22:30</li>
-                <li>Thu 7 - Chu Nhat: 08:00 - 23:00</li>
-                <li style="color:var(--secondary); font-weight:600;">Hotline giao hang nhanh:</li>
-                <li style="color:#fff; font-size:1.1rem; font-weight:700;">1900 6868</li>
+                <li data-i18n="footer_hours_weekdays">Thu 2 - Thu 6: 07:00 - 22:30</li>
+                <li data-i18n="footer_hours_weekend">Thu 7 - Chu Nhat: 08:00 - 23:00</li>
+                <li style="color:var(--secondary); font-weight:600;" data-i18n="footer_hotline_label">Hotline giao hang nhanh:</li>
+                <li style="color:#fff; font-size:1.1rem; font-weight:700;" data-i18n="footer_hotline">1900 6868</li>
             </ul>
         </div>
 
         <div>
-            <h4 class="footer-title">Dia Chi Lien He</h4>
-            <div class="footer-contact-item"><span>📍</span><span>123 Duong Ba Thang Hai, Quan 10, TP.HCM</span></div>
-            <div class="footer-contact-item"><span>✉️</span><span>lienhe@glowdrinks.com</span></div>
-            <div class="footer-contact-item"><span>💳</span><span>MoMo, VNPay, Chuyen khoan, COD</span></div>
+            <h4 class="footer-title" data-i18n="footer_title_contact">Dia Chi Lien He</h4>
+                <div class="footer-contact-item"><span>📍</span><span data-i18n="footer_address">123 Duong Ba Thang Hai, Quan 10, TP.HCM</span></div>
+                <div class="footer-contact-item"><span>✉️</span><span data-i18n="footer_email">lienhe@glowdrinks.com</span></div>
+                <div class="footer-contact-item"><span>💳</span><span data-i18n="footer_payment_methods">MoMo, VNPay, Chuyen khoan, COD</span></div>
         </div>
     </div>
 
     <div class="footer-bottom">
-        <p>&copy; 2026 GlowDrinks Store. Tat ca quyen duoc bao luu.</p>
-        <p>Thiet ke boi Antigravity AI</p>
+        <p data-i18n="footer_copyright">&copy; 2026 GlowDrinks Store. Tat ca quyen duoc bao luu.</p>
+        <p data-i18n="footer_designer">Thiet ke boi Antigravity AI</p>
     </div>
 </footer>
 

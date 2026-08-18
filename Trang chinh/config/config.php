@@ -64,31 +64,49 @@ function formatVND($amount) {
 
 function getProductImage($path) {
     if (!empty($path)) {
-        // 1. Thu duong dan tuyet doi tu ROOT_PATH
+        // 1. Nếu là URL http/https → dùng thẳng
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        // 2. Thử đường dẫn tuyệt đối từ ROOT_PATH
         $full = ROOT_PATH . $path;
         if (file_exists($full)) {
             return '/' . ltrim(str_replace('\\', '/', $path), '/');
         }
-        $basename = basename($path);
+        $basename    = basename($path);
         $name_no_ext = pathinfo($basename, PATHINFO_FILENAME);
 
-        // 2. Thu trong anh/ voi ten goc
+        // 3. Thử trong anh/ với tên gốc
         foreach (['.png', '.jpg', '.jpeg', '.webp'] as $ext) {
             $try = ROOT_PATH . 'anh/' . $name_no_ext . $ext;
-            if (file_exists($try)) {
-                return '/anh/' . $name_no_ext . $ext;
-            }
+            if (file_exists($try)) return '/anh/' . $name_no_ext . $ext;
         }
-
-        // 3. Thu trong anh/products/
+        // 4. Thử trong anh/products/
         foreach (['.png', '.jpg', '.jpeg', '.webp'] as $ext) {
             $try = ROOT_PATH . 'anh/products/' . $name_no_ext . $ext;
-            if (file_exists($try)) {
-                return '/anh/products/' . $name_no_ext . $ext;
-            }
+            if (file_exists($try)) return '/anh/products/' . $name_no_ext . $ext;
         }
     }
-    // Anh mac dinh DuckyDuck
-    return 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&auto=format&fit=crop&q=60';
+    // Ảnh mặc định đẹp
+    return 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=500&auto=format&fit=crop&q=70';
+}
+
+// Current site language (read from cookie), default to 'vi'
+function get_site_lang() {
+    if (isset($_COOKIE['site_lang']) && in_array($_COOKIE['site_lang'], ['vi','en','ja','zh'])) {
+        return $_COOKIE['site_lang'];
+    }
+    return 'vi';
+}
+
+// Localize a DB row by preferring language-specific columns like name_en, description_ja, etc.
+function localize_row(array $row, string $lang, array $fields = ['name','description','content']) : array {
+    foreach ($fields as $f) {
+        $lang_key = $f . '_' . $lang;
+        if (isset($row[$lang_key]) && $row[$lang_key] !== null && $row[$lang_key] !== '') {
+            $row[$f] = $row[$lang_key];
+        }
+    }
+    return $row;
 }
 ?>

@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../config/config.php';
 header('Content-Type: application/json');
 
+$site_lang = get_site_lang();
+
 if (!isset($_SESSION['cart'])) $_SESSION['cart'] = [];
 
 $action = $_POST['action'] ?? '';
@@ -25,6 +27,7 @@ if ($action === 'add') {
     $stmt = $pdo->prepare("SELECT * FROM products WHERE id = ? AND status = 1");
     $stmt->execute([$product_id]);
     $product = $stmt->fetch();
+    if ($product) $product = localize_row($product, $site_lang, ['name','description']);
 
     if (!$product) { echo json_encode(['status'=>'error','message'=>'San pham khong ton tai!']); exit(); }
 
@@ -34,10 +37,10 @@ if ($action === 'add') {
     $toppings_cost = 0;
     $toppings_list = [];
     foreach ($toppings_in as $tid) {
-        $ts = $pdo->prepare("SELECT name, price FROM products WHERE id = ?");
+        $ts = $pdo->prepare("SELECT * FROM products WHERE id = ?");
         $ts->execute([intval($tid)]);
         $top = $ts->fetch();
-        if ($top) { $toppings_cost += $top['price']; $toppings_list[] = $top['name']; }
+        if ($top) { $top = localize_row($top, $site_lang, ['name','description']); $toppings_cost += $top['price']; $toppings_list[] = $top['name']; }
     }
 
     $final_price  = $price + $size_surcharge + $toppings_cost;
