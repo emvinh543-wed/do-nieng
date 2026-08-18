@@ -61,7 +61,7 @@ if (isset($pdo)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vịt Con 3D Háu Ăn - Đồ Họa 3D Cao Cấp & Bản Đồ Sống Động</title>
+    <title>Vịt Con 3D Háu Ăn - Đồ Họa 3D Siêu Chân Thật & Bản Đồ Chi Tiết</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -197,18 +197,18 @@ if (isset($pdo)) {
         #crosshair {
             position: absolute;
             top: 50%; left: 50%;
-            width: 14px; height: 14px;
+            width: 16px; height: 16px;
             transform: translate(-50%, -50%);
             pointer-events: none;
             display: none;
             z-index: 20;
         }
         #crosshair::before, #crosshair::after {
-            content: ''; position: absolute; background: rgba(255, 255, 255, 0.85);
-            box-shadow: 0 0 4px rgba(0,0,0,0.8);
+            content: ''; position: absolute; background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 5px rgba(0,0,0,0.9);
         }
-        #crosshair::before { top: 6px; left: 0; width: 14px; height: 2px; }
-        #crosshair::after { top: 0; left: 6px; width: 2px; height: 14px; }
+        #crosshair::before { top: 7px; left: 0; width: 16px; height: 2px; }
+        #crosshair::after { top: 0; left: 7px; width: 2px; height: 16px; }
 
         /* Modals & Selection Drawer */
         .game-modal {
@@ -415,7 +415,7 @@ if (isset($pdo)) {
     <div class="game-modal" id="start-modal">
         <div class="modal-card">
             <h2 data-i18n="start_title">🐥 CHỌN NHÂN VẬT VỊT & THẾ GIỚI 3D SỐNG ĐỘNG 🗺️</h2>
-            <p data-i18n="start_subtitle">Khám phá thế giới 3D đa dạng: Thành phố, Nhà cửa, Đường rẫy tàu hỏa, Bãi biển, Tàu biển, Thác nước & Hồ ao!</p>
+            <p data-i18n="start_subtitle">Khám phá thế giới 3D đa dạng: Thành phố, Nhà cửa chân thật, Đường rẫy Tàu hỏa đầu máy hơi nước, Tàu chở Container & Bãi biển!</p>
 
             <!-- Duck Skins Selection -->
             <div class="section-label" data-i18n="duck_section_label">🐥 1. CHỌN CHÚ VỊT 3D CỦA BẠN:</div>
@@ -666,7 +666,6 @@ if (isset($pdo)) {
 
         fpYaw -= movementX * 0.003;
         fpPitch -= movementY * 0.003;
-        // Limit pitch looking up/down
         fpPitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, fpPitch));
     });
 
@@ -685,29 +684,29 @@ if (isset($pdo)) {
     let activeTrains = [];
     let activeShips = [];
     let activeParticles = null;
-    let trainSteamParticles = [];
+    let activeSmokeParticles = [];
     let score = 0, timeLeft = 60, gameActive = false, timerInterval;
 
-    const CHUNK_SIZE = 90;
+    const CHUNK_SIZE = 95;
     const LOAD_RADIUS = 2;
     const activeChunks = new Map();
 
     const MAP_THEMES = {
         park: {
             bg: 0x0b172a, ground: 0x15803d, water: 0x0284c7, treeLeaf: 0x16a34a, treeTrunk: 0x78350f, rock: 0x64748b, bridge: 0x92400e,
-            emissiveWater: 0x0284c7, emissiveIntensity: 0.1, particleColor: 0x86efac
+            emissiveWater: 0x0284c7, emissiveIntensity: 0.15, particleColor: 0x86efac
         },
         volcano: {
             bg: 0x1c0a0a, ground: 0x262626, water: 0xeab308, treeLeaf: 0xd97706, treeTrunk: 0x451a03, rock: 0x57534e, bridge: 0x44403c,
-            emissiveWater: 0xd97706, emissiveIntensity: 0.7, particleColor: 0xf97316
+            emissiveWater: 0xd97706, emissiveIntensity: 0.75, particleColor: 0xf97316
         },
         snow: {
             bg: 0x0f172a, ground: 0xf1f5f9, water: 0x38bdf8, treeLeaf: 0x0284c7, treeTrunk: 0x334155, rock: 0x94a3b8, bridge: 0x475569,
-            emissiveWater: 0x38bdf8, emissiveIntensity: 0.1, particleColor: 0xffffff
+            emissiveWater: 0x38bdf8, emissiveIntensity: 0.15, particleColor: 0xffffff
         },
         galaxy: {
             bg: 0x080414, ground: 0x3b0764, water: 0xc084fc, treeLeaf: 0xf43f5e, treeTrunk: 0x6b21a8, rock: 0xa855f7, bridge: 0x581c87,
-            emissiveWater: 0xc084fc, emissiveIntensity: 0.8, particleColor: 0xec4899
+            emissiveWater: 0xc084fc, emissiveIntensity: 0.85, particleColor: 0xec4899
         }
     };
 
@@ -742,7 +741,7 @@ if (isset($pdo)) {
     function rebuildMapEnvironment() {
         const theme = MAP_THEMES[currentMapWorld] || MAP_THEMES.park;
         scene.background = new THREE.Color(theme.bg);
-        scene.fog = new THREE.FogExp2(theme.bg, 0.007);
+        scene.fog = new THREE.FogExp2(theme.bg, 0.006);
 
         // Remove old lights
         scene.children.filter(c => c.isLight).forEach(l => scene.remove(l));
@@ -750,51 +749,49 @@ if (isset($pdo)) {
         hemiLight = new THREE.HemisphereLight(0xffffff, theme.ground, 0.65);
         scene.add(hemiLight);
 
-        dirLight = new THREE.DirectionalLight((currentMapWorld === 'volcano') ? 0xff6622 : 0xfffae6, 1.35);
-        dirLight.position.set(40, 60, 40);
+        dirLight = new THREE.DirectionalLight((currentMapWorld === 'volcano') ? 0xff6622 : 0xfffae6, 1.4);
+        dirLight.position.set(45, 65, 45);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
         dirLight.shadow.bias = -0.0001;
         dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 250;
-        dirLight.shadow.camera.left = -70;
-        dirLight.shadow.camera.right = 70;
-        dirLight.shadow.camera.top = 70;
-        dirLight.shadow.camera.bottom = -70;
+        dirLight.shadow.camera.far = 280;
+        dirLight.shadow.camera.left = -75;
+        dirLight.shadow.camera.right = 75;
+        dirLight.shadow.camera.top = 75;
+        dirLight.shadow.camera.bottom = -75;
         scene.add(dirLight);
 
-        // Particle atmosphere
         createWeatherParticles(theme.particleColor);
 
-        // Clear active chunks
         for (const [key, group] of activeChunks.entries()) {
             scene.remove(group);
         }
         activeChunks.clear();
         activeTrains = [];
         activeShips = [];
+        activeSmokeParticles = [];
 
         updateWorldChunksAroundPlayer(0, 0);
     }
 
-    // Atmosphere Particle System
     function createWeatherParticles(colorHex) {
         if (activeParticles) scene.remove(activeParticles);
-        const count = 400;
+        const count = 450;
         const geom = new THREE.BufferGeometry();
         const positions = new Float32Array(count * 3);
 
         for (let i = 0; i < count; i++) {
-            positions[i*3] = (Math.random() - 0.5) * 350;
-            positions[i*3+1] = Math.random() * 100;
-            positions[i*3+2] = (Math.random() - 0.5) * 350;
+            positions[i*3] = (Math.random() - 0.5) * 380;
+            positions[i*3+1] = Math.random() * 110;
+            positions[i*3+2] = (Math.random() - 0.5) * 380;
         }
 
         geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         const mat = new THREE.PointsMaterial({
             color: colorHex,
-            size: 1.4,
+            size: 1.5,
             transparent: true,
             opacity: 0.65
         });
@@ -808,7 +805,352 @@ if (isset($pdo)) {
         return x - Math.floor(x);
     }
 
-    // PROCEDURAL CHUNK BUILDER (Houses, City, Railways, Trains, Lakes, Ocean, Ships, Docks, Beaches)
+    // -------------------------------------------------------------
+    // ULTRA-DETAILED REALISTIC 3D HOUSE BUILDER (Nhà Cửa Chân Thật)
+    // -------------------------------------------------------------
+    function createUltraDetailedHouse(seed, theme) {
+        const houseGroup = new THREE.Group();
+
+        // 1. Raised Stone Base & Walkway
+        const baseGeo = new THREE.BoxGeometry(7.2, 0.4, 6.2);
+        const baseMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.9 });
+        const base = new THREE.Mesh(baseGeo, baseMat);
+        base.position.y = 0.2; base.receiveShadow = true; houseGroup.add(base);
+
+        // 2. Main Wall Body (Wood / Plaster)
+        const wallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.75 });
+        const wallGeo = new THREE.BoxGeometry(6.6, 3.8, 5.6);
+        const wall = new THREE.Mesh(wallGeo, wallMat);
+        wall.position.y = 2.1; wall.castShadow = true; wall.receiveShadow = true;
+        houseGroup.add(wall);
+
+        // 3. Sloped Tiled Roof (Hip & Gable Roof)
+        const roofMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.5 });
+        const roofGeo = new THREE.ConeGeometry(5.2, 2.6, 4);
+        const roof = new THREE.Mesh(roofGeo, roofMat);
+        roof.rotation.y = Math.PI / 4;
+        roof.position.y = 5.3;
+        roof.castShadow = true;
+        houseGroup.add(roof);
+
+        // Roof Trim / Eaves
+        const eavesGeo = new THREE.BoxGeometry(7.0, 0.2, 6.0);
+        const eavesMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.8 });
+        const eaves = new THREE.Mesh(eavesGeo, eavesMat);
+        eaves.position.y = 4.0;
+        houseGroup.add(eaves);
+
+        // 4. Brick Chimney & Smoke
+        const chimneyGeo = new THREE.BoxGeometry(0.8, 2.4, 0.8);
+        const chimneyMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.9 });
+        const chimney = new THREE.Mesh(chimneyGeo, chimneyMat);
+        chimney.position.set(1.8, 5.2, 1.2);
+        chimney.castShadow = true;
+        houseGroup.add(chimney);
+
+        // 5. Front Porch with White Pillars & Steps
+        const porchMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.7 });
+        const porchRoof = new THREE.Mesh(new THREE.BoxGeometry(2.8, 0.2, 1.6), porchMat);
+        porchRoof.position.set(0, 2.9, 3.2); porchRoof.castShadow = true;
+        houseGroup.add(porchRoof);
+
+        const pillarMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        const p1 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.5, 8), pillarMat); p1.position.set(-1.1, 1.65, 3.8);
+        const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.5, 8), pillarMat); p2.position.set(1.1, 1.65, 3.8);
+        houseGroup.add(p1, p2);
+
+        // Door with handle & frame
+        const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(1.3, 2.3, 0.15), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+        doorFrame.position.set(0, 1.35, 2.82);
+        const door = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.1, 0.1), new THREE.MeshStandardMaterial({ color: 0x92400e }));
+        door.position.set(0, 1.35, 2.88);
+        const handle = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), new THREE.MeshStandardMaterial({ color: 0xf5a623, metalness: 0.8 }));
+        handle.position.set(0.4, 1.35, 2.95);
+        houseGroup.add(doorFrame, door, handle);
+
+        // 6. Windows with Frame & Glass
+        const winFrameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+        const winGlassMat = new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0xfde047, emissiveIntensity: 0.7, roughness: 0.1 });
+
+        const windowPositions = [
+            [-1.9, 2.4, 2.82], [1.9, 2.4, 2.82], // Front
+            [-3.32, 2.4, 0], [3.32, 2.4, 0]     // Sides
+        ];
+
+        windowPositions.forEach((pos, idx) => {
+            const isSide = idx >= 2;
+            const wf = new THREE.Mesh(new THREE.BoxGeometry(isSide ? 0.15 : 1.1, 1.3, isSide ? 1.1 : 0.15), winFrameMat);
+            wf.position.set(pos[0], pos[1], pos[2]);
+            const wg = new THREE.Mesh(new THREE.BoxGeometry(isSide ? 0.1 : 0.95, 1.15, isSide ? 0.95 : 0.1), winGlassMat);
+            wg.position.set(pos[0], pos[1], pos[2] + (isSide ? 0 : 0.02));
+            houseGroup.add(wf, wg);
+
+            // Window Flower Box under front windows
+            if (!isSide) {
+                const fb = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.35, 0.4), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+                fb.position.set(pos[0], pos[1] - 0.8, pos[2] + 0.15);
+                const flower = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 6), new THREE.MeshStandardMaterial({ color: 0xec4899 }));
+                flower.position.set(pos[0], pos[1] - 0.55, pos[2] + 0.15);
+                houseGroup.add(fb, flower);
+            }
+        });
+
+        // 7. Garden Fence & Mailbox
+        const fenceMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+        for (let fx = -3.2; fx <= 3.2; fx += 1.0) {
+            const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.9, 0.12), fenceMat);
+            post.position.set(fx, 0.45, 4.5); post.castShadow = true;
+            houseGroup.add(post);
+        }
+        const railBar = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.1, 0.08), fenceMat);
+        railBar.position.set(0, 0.5, 4.5); houseGroup.add(railBar);
+
+        // Mailbox
+        const mb = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.3, 0.5), new THREE.MeshStandardMaterial({ color: 0x0284c7 }));
+        mb.position.set(2.8, 0.8, 4.5);
+        const mbPole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 6), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+        mbPole.position.set(2.8, 0.35, 4.5);
+        houseGroup.add(mb, mbPole);
+
+        return houseGroup;
+    }
+
+    // -------------------------------------------------------------
+    // ULTRA-DETAILED REALISTIC 3D SKYSCRAPER BUILDER (Tòa Nhà Đô Thị)
+    // -------------------------------------------------------------
+    function createUltraDetailedSkyscraper(seed, theme) {
+        const skyGroup = new THREE.Group();
+        const height = 18 + seededRandom(seed) * 24;
+        const w = 7 + seededRandom(seed+1) * 4;
+        const d = 7 + seededRandom(seed+2) * 4;
+
+        // Ground Floor Storefront
+        const lobbyGeo = new THREE.BoxGeometry(w + 0.4, 3.8, d + 0.4);
+        const lobbyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.2, metalness: 0.5 });
+        const lobby = new THREE.Mesh(lobbyGeo, lobbyMat);
+        lobby.position.y = 1.9; lobby.castShadow = true; skyGroup.add(lobby);
+
+        // Storefront Fabric Awning
+        const awningGeo = new THREE.BoxGeometry(w + 0.6, 0.3, 1.2);
+        const awningMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.6 });
+        const awning = new THREE.Mesh(awningGeo, awningMat);
+        awning.position.set(0, 3.6, d/2 + 0.6); skyGroup.add(awning);
+
+        // Main Skyscraper Body with Facade Grid
+        const bodyGeo = new THREE.BoxGeometry(w, height, d);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.4 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = height / 2 + 3.8; body.castShadow = true; body.receiveShadow = true;
+        skyGroup.add(body);
+
+        // Glass Curtain Windows
+        const winMat = new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0xfde047, emissiveIntensity: 0.85, roughness: 0.1 });
+        for (let wy = 5.5; wy < height + 3.5; wy += 3.2) {
+            const glassRing = new THREE.Mesh(new THREE.BoxGeometry(w + 0.08, 1.3, d + 0.08), winMat);
+            glassRing.position.y = wy;
+            skyGroup.add(glassRing);
+        }
+
+        // Roof Helipad & Antenna Tower
+        const heliGeo = new THREE.CylinderGeometry(2.4, 2.4, 0.2, 16);
+        const heliMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.8 });
+        const helipad = new THREE.Mesh(heliGeo, heliMat);
+        helipad.position.y = height + 3.9; skyGroup.add(helipad);
+
+        // Red Aviation Warning Beacon Light on Antenna Tower
+        const towerGeo = new THREE.CylinderGeometry(0.1, 0.18, 4.5, 8);
+        const towerMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.8 });
+        const tower = new THREE.Mesh(towerGeo, towerMat);
+        tower.position.set(0, height + 6.1, 0); skyGroup.add(tower);
+
+        const beacon = new THREE.PointLight(0xef4444, 2.5, 25);
+        beacon.position.set(0, height + 8.4, 0); skyGroup.add(beacon);
+
+        return skyGroup;
+    }
+
+    // -------------------------------------------------------------
+    // ULTRA-DETAILED REALISTIC 3D STEAM LOCOMOTIVE TRAIN (Tàu Hỏa Hơi Nước)
+    // -------------------------------------------------------------
+    function createUltraDetailedTrain(originX, originZ, seed) {
+        const trainGroup = new THREE.Group();
+
+        // 1. Steam Locomotive Engine
+        const engineGroup = new THREE.Group();
+
+        // Boiler Barrel
+        const boilerGeo = new THREE.CylinderGeometry(1.3, 1.3, 5.2, 16);
+        const boilerMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.7, roughness: 0.3 });
+        const boiler = new THREE.Mesh(boilerGeo, boilerMat);
+        boiler.rotation.z = Math.PI / 2; boiler.position.set(1.5, 1.8, 0); boiler.castShadow = true;
+        engineGroup.add(boiler);
+
+        // Driver Cabin / Cab
+        const cabGeo = new THREE.BoxGeometry(2.8, 3.2, 2.8);
+        const cabMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, metalness: 0.3, roughness: 0.5 });
+        const cab = new THREE.Mesh(cabGeo, cabMat);
+        cab.position.set(-1.8, 2.0, 0); cab.castShadow = true;
+        engineGroup.add(cab);
+
+        // Cab Roof
+        const cabRoof = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.3, 3.1), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+        cabRoof.position.set(-1.8, 3.7, 0); engineGroup.add(cabRoof);
+
+        // Front Wedge Cowcatcher (Pilot)
+        const pilotGeo = new THREE.ConeGeometry(1.4, 1.2, 4);
+        const pilotMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.6 });
+        const pilot = new THREE.Mesh(pilotGeo, pilotMat);
+        pilot.rotation.z = -Math.PI / 2; pilot.rotation.x = Math.PI / 4;
+        pilot.position.set(4.3, 0.7, 0); engineGroup.add(pilot);
+
+        // Smokestack (Chimney)
+        const chimneyGeo = new THREE.CylinderGeometry(0.38, 0.28, 1.4, 12);
+        const chimneyMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 });
+        const chimney = new THREE.Mesh(chimneyGeo, chimneyMat);
+        chimney.position.set(3.2, 3.4, 0); engineGroup.add(chimney);
+
+        // Steam Domes on Boiler
+        const dome1 = new THREE.Mesh(new THREE.SphereGeometry(0.42, 10, 10), new THREE.MeshStandardMaterial({ color: 0xf5a623, metalness: 0.9 }));
+        dome1.position.set(1.4, 3.2, 0); engineGroup.add(dome1);
+
+        // Heavy Drive Wheels
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, metalness: 0.8 });
+        for (let wx = -0.5; wx <= 3.2; wx += 1.8) {
+            const wL = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.25, 16), wheelMat);
+            wL.rotation.x = Math.PI / 2; wL.position.set(wx, 0.7, 1.35);
+            const wR = wL.clone(); wR.position.set(wx, 0.7, -1.35);
+            engineGroup.add(wL, wR);
+        }
+
+        // Headlight with Glowing Yellow Spotlight Cone
+        const headlightBox = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), new THREE.MeshStandardMaterial({ color: 0xf5a623, metalness: 0.8 }));
+        headlightBox.position.set(4.2, 2.2, 0); engineGroup.add(headlightBox);
+
+        const headlight = new THREE.PointLight(0xfde047, 3, 30);
+        headlight.position.set(4.6, 2.2, 0); engineGroup.add(headlight);
+
+        engineGroup.position.set(0, 0, 0);
+        trainGroup.add(engineGroup);
+
+        // 2. Coal Tender Car
+        const tenderGroup = new THREE.Group();
+        const tenderBody = new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.8, 2.5), new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.8 }));
+        tenderBody.position.set(-5.6, 1.3, 0); tenderBody.castShadow = true;
+        const coalMound = new THREE.Mesh(new THREE.SphereGeometry(1.6, 8, 6), new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 1 }));
+        coalMound.scale.set(1.2, 0.4, 0.7); coalMound.position.set(-5.6, 2.2, 0);
+        tenderGroup.add(tenderBody, coalMound);
+        trainGroup.add(tenderGroup);
+
+        // 3. Passenger Coaches
+        for (let c = 1; c <= 3; c++) {
+            const coachGroup = new THREE.Group();
+            const coachBody = new THREE.Mesh(new THREE.BoxGeometry(6.4, 2.6, 2.6), new THREE.MeshStandardMaterial({ color: (c % 2 === 0) ? 0x0284c7 : 0x16a34a, roughness: 0.4 }));
+            coachBody.position.set(-5.6 - c * 7.2, 1.7, 0); coachBody.castShadow = true;
+            
+            // Roof Vents
+            const coachRoof = new THREE.Mesh(new THREE.BoxGeometry(6.6, 0.3, 2.7), new THREE.MeshStandardMaterial({ color: 0xf8fafc }));
+            coachRoof.position.set(-5.6 - c * 7.2, 3.1, 0);
+            
+            // Windows
+            const winMat = new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0xfde047, emissiveIntensity: 0.8 });
+            for (let wx = -2.2; wx <= 2.2; wx += 1.4) {
+                const wL = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.1), winMat);
+                wL.position.set(-5.6 - c * 7.2 + wx, 2.0, 1.32);
+                const wR = wL.clone(); wR.position.set(-5.6 - c * 7.2 + wx, 2.0, -1.32);
+                coachGroup.add(wL, wR);
+            }
+
+            coachGroup.add(coachBody, coachRoof);
+            trainGroup.add(coachGroup);
+        }
+
+        trainGroup.position.set(originX - CHUNK_SIZE/2 + seededRandom(seed+1)*CHUNK_SIZE, 0, originZ);
+        trainGroup.userData = { speed: 0.24 + seededRandom(seed+2)*0.16, trackZ: originZ, originX: originX, chimneyX: 3.2, chimneyY: 3.4 };
+        
+        return trainGroup;
+    }
+
+    // -------------------------------------------------------------
+    // ULTRA-DETAILED REALISTIC 3D CARGO SHIPS & SAILBOATS (Tàu Biển Dập Dềnh Sóng)
+    // -------------------------------------------------------------
+    function createUltraDetailedShip(originX, originZ, seed) {
+        const shipGroup = new THREE.Group();
+        const shipType = Math.floor(seededRandom(seed) * 2);
+
+        if (shipType === 0) {
+            // Container Freight Ship
+            // Lower Red Underwater Hull
+            const redHullGeo = new THREE.BoxGeometry(14, 1.4, 4.4);
+            const redHullMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.5 });
+            const redHull = new THREE.Mesh(redHullGeo, redHullMat);
+            redHull.position.y = 0.5; redHull.castShadow = true; shipGroup.add(redHull);
+
+            // Upper Navy Blue Hull & Pointed Bow
+            const navyHullGeo = new THREE.BoxGeometry(13.8, 1.6, 4.2);
+            const navyHullMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 });
+            const navyHull = new THREE.Mesh(navyHullGeo, navyHullMat);
+            navyHull.position.y = 1.9; navyHull.castShadow = true; shipGroup.add(navyHull);
+
+            // Pointed Bow Nose
+            const bowGeo = new THREE.ConeGeometry(2.1, 4.2, 4);
+            const bow = new THREE.Mesh(bowGeo, navyHullMat);
+            bow.rotation.z = -Math.PI / 2; bow.rotation.x = Math.PI / 4;
+            bow.position.set(8.5, 1.9, 0); shipGroup.add(bow);
+
+            // Multi-colored Container Stacks on Deck
+            const containerColors = [0xdc2626, 0x0284c7, 0x16a34a, 0xca8a04, 0x7c3aed];
+            for (let cx = -4; cx <= 3; cx += 2.2) {
+                for (let cy = 0; cy < 2; cy++) {
+                    const cMat = new THREE.MeshStandardMaterial({ color: containerColors[Math.floor(Math.abs(cx+cy)) % containerColors.length], roughness: 0.6 });
+                    const container = new THREE.Mesh(new THREE.BoxGeometry(2.0, 1.2, 3.6), cMat);
+                    container.position.set(cx, 3.2 + cy * 1.3, 0); container.castShadow = true;
+                    shipGroup.add(container);
+                }
+            }
+
+            // Rear Bridge Tower & Smokestack
+            const bridgeGeo = new THREE.BoxGeometry(3.2, 4.2, 3.8);
+            const bridgeMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+            const bridge = new THREE.Mesh(bridgeGeo, bridgeMat);
+            bridge.position.set(-5.2, 4.8, 0); bridge.castShadow = true; shipGroup.add(bridge);
+
+            // Captain Wheelhouse Windows
+            const winGeo = new THREE.BoxGeometry(3.3, 0.6, 3.9);
+            const winMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 0.6 });
+            const windows = new THREE.Mesh(winGeo, winMat);
+            windows.position.set(-5.2, 6.2, 0); shipGroup.add(windows);
+
+            // Smokestack Funnel
+            const funnel = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.7, 2.2, 12), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+            funnel.position.set(-5.8, 7.8, 0); shipGroup.add(funnel);
+
+        } else {
+            // Classic Wooden Sailboat / Frigate
+            const hullGeo = new THREE.BoxGeometry(10, 2.2, 3.4);
+            const hullMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.7 });
+            const hull = new THREE.Mesh(hullGeo, hullMat);
+            hull.position.y = 1.1; hull.castShadow = true; shipGroup.add(hull);
+
+            // 2 Masts with Billowing White Cloth Sails
+            const mastMat = new THREE.MeshStandardMaterial({ color: 0x451a03 });
+            const sailMat = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide, roughness: 0.9 });
+
+            [-1.8, 2.2].forEach(mx => {
+                const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.22, 8.5, 8), mastMat);
+                mast.position.set(mx, 5.2, 0); shipGroup.add(mast);
+
+                const sail = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 5.5), sailMat);
+                sail.position.set(mx, 5.8, 0.8); sail.rotation.y = 0.2;
+                shipGroup.add(sail);
+            });
+        }
+
+        shipGroup.position.set(originX + (seededRandom(seed+1)-0.5)*(CHUNK_SIZE-30), 0.1, originZ + (seededRandom(seed+2)-0.5)*(CHUNK_SIZE-30));
+        shipGroup.userData = { bobOffset: Math.random()*Math.PI*2, speedX: (Math.random()-0.5)*0.07 };
+        return shipGroup;
+    }
+
+    // PROCEDURAL CHUNK BUILDER
     function createChunkGroup(cx, cz, mapKey) {
         const theme = MAP_THEMES[mapKey] || MAP_THEMES.park;
         const chunkGroup = new THREE.Group();
@@ -825,58 +1167,23 @@ if (isset($pdo)) {
 
         let seed = (cx * 73856093) ^ (cz * 19349663);
 
-        // 1. CITY & HOUSES (Thành phố, Nhà cửa, Đèn đường)
+        // 1. CITY & HOUSES GENERATION
         seed++;
-        if (seededRandom(seed) > 0.4) {
+        if (seededRandom(seed) > 0.35) {
             const isCityChunk = (Math.abs(cx + cz) % 4 === 0);
             const buildingCount = isCityChunk ? (3 + Math.floor(seededRandom(seed+1)*3)) : (2 + Math.floor(seededRandom(seed+1)*2));
 
             for (let b = 0; b < buildingCount; b++) {
                 seed++;
-                const bx = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 24);
+                const bx = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 28);
                 seed++;
-                const bz = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 24);
+                const bz = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 28);
 
-                const buildingGroup = new THREE.Group();
+                let buildingGroup;
                 if (isCityChunk) {
-                    // Modern City Skyscrapers
-                    const height = 14 + seededRandom(seed+2) * 22;
-                    const w = 6 + seededRandom(seed+3) * 5;
-                    const d = 6 + seededRandom(seed+4) * 5;
-
-                    const bodyGeo = new THREE.BoxGeometry(w, height, d);
-                    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.3, metalness: 0.4 });
-                    const body = new THREE.Mesh(bodyGeo, bodyMat);
-                    body.position.y = height / 2;
-                    body.castShadow = true; body.receiveShadow = true;
-                    buildingGroup.add(body);
-
-                    // Glowing Windows
-                    const winMat = new THREE.MeshStandardMaterial({ color: 0xfde047, emissive: 0xfde047, emissiveIntensity: 0.8 });
-                    for (let wy = 3; wy < height - 2; wy += 3.5) {
-                        const win = new THREE.Mesh(new THREE.BoxGeometry(w + 0.1, 1.2, d + 0.1), winMat);
-                        win.position.y = wy;
-                        buildingGroup.add(win);
-                    }
+                    buildingGroup = createUltraDetailedSkyscraper(seed, theme);
                 } else {
-                    // Suburban Houses with tiled roofs & doors
-                    const houseBodyGeo = new THREE.BoxGeometry(5.5, 3.2, 4.5);
-                    const houseBodyMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.8 });
-                    const houseBody = new THREE.Mesh(houseBodyGeo, houseBodyMat);
-                    houseBody.position.y = 1.6;
-                    houseBody.castShadow = true;
-
-                    const roofGeo = new THREE.ConeGeometry(4.2, 2.2, 4);
-                    const roofMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.6 });
-                    const roof = new THREE.Mesh(roofGeo, roofMat);
-                    roof.rotation.y = Math.PI / 4;
-                    roof.position.y = 4.2;
-                    roof.castShadow = true;
-
-                    const door = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.8, 0.2), new THREE.MeshStandardMaterial({ color: 0x78350f }));
-                    door.position.set(0, 0.9, 2.3);
-
-                    buildingGroup.add(houseBody, roof, door);
+                    buildingGroup = createUltraDetailedHouse(seed, theme);
                 }
 
                 buildingGroup.position.set(bx, 0, bz);
@@ -884,65 +1191,40 @@ if (isset($pdo)) {
             }
         }
 
-        // 2. RAILWAY TRACKS & MOVING TRAIN (Đường rẫy & Tàu hỏa)
+        // 2. RAILWAY TRACKS & STEAM LOCOMOTIVE TRAIN
         if (Math.abs(cz) % 5 === 0) {
             const railGroup = new THREE.Group();
             const railMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.8, roughness: 0.2 });
             const sleeperMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.9 });
 
             // Metallic rails across X axis
-            const railL = new THREE.Mesh(new THREE.BoxGeometry(CHUNK_SIZE, 0.15, 0.2), railMat);
+            const railL = new THREE.Mesh(new THREE.BoxGeometry(CHUNK_SIZE, 0.18, 0.22), railMat);
             const railR = railL.clone();
-            railL.position.set(originX, 0.12, originZ - 1.2);
-            railR.position.set(originX, 0.12, originZ + 1.2);
+            railL.position.set(originX, 0.12, originZ - 1.35);
+            railR.position.set(originX, 0.12, originZ + 1.35);
             railGroup.add(railL, railR);
 
             // Wooden sleepers
-            for (let s = -CHUNK_SIZE/2 + 2; s < CHUNK_SIZE/2; s += 3) {
-                const sleeper = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 3.2), sleeperMat);
+            for (let s = -CHUNK_SIZE/2 + 2; s < CHUNK_SIZE/2; s += 2.8) {
+                const sleeper = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.12, 3.5), sleeperMat);
                 sleeper.position.set(originX + s, 0.06, originZ);
                 railGroup.add(sleeper);
             }
             chunkGroup.add(railGroup);
 
-            // Spawn Moving 3D Train along tracks
+            // Spawn Moving 3D Steam Train
             seed++;
-            if (seededRandom(seed) > 0.4) {
-                const trainGroup = new THREE.Group();
-                const engineGeo = new THREE.BoxGeometry(6, 2.8, 2.6);
-                const engineMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.3, metalness: 0.5 });
-                const engine = new THREE.Mesh(engineGeo, engineMat);
-                engine.position.y = 1.5; engine.castShadow = true;
-                trainGroup.add(engine);
-
-                // Chimney
-                const chimney = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 1.2, 8), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
-                chimney.position.set(2, 3.2, 0); trainGroup.add(chimney);
-
-                // Headlight
-                const headlight = new THREE.PointLight(0xfde047, 2, 20);
-                headlight.position.set(3.2, 1.6, 0); trainGroup.add(headlight);
-
-                // Passenger Cars
-                for (let c = 1; c <= 3; c++) {
-                    const carGeo = new THREE.BoxGeometry(5.2, 2.4, 2.4);
-                    const carMat = new THREE.MeshStandardMaterial({ color: (c % 2 === 0) ? 0x0284c7 : 0x16a34a });
-                    const car = new THREE.Mesh(carGeo, carMat);
-                    car.position.set(-c * 6.2, 1.3, 0); car.castShadow = true;
-                    trainGroup.add(car);
-                }
-
-                trainGroup.position.set(originX - CHUNK_SIZE/2 + seededRandom(seed+1)*CHUNK_SIZE, 0, originZ);
-                trainGroup.userData = { speed: 0.22 + seededRandom(seed+2)*0.18, trackZ: originZ, originX: originX };
-                scene.add(trainGroup);
-                activeTrains.push(trainGroup);
+            if (seededRandom(seed) > 0.35) {
+                const train = createUltraDetailedTrain(originX, originZ, seed);
+                scene.add(train);
+                activeTrains.push(train);
             }
         }
 
-        // 3. OCEAN, BEACH & SEA SHIPS (Tàu biển, Biển & Bãi biển)
+        // 3. OCEAN, BEACH & SEA SHIPS
         const isSeaChunk = (Math.abs(cx) % 4 === 0 && cz < -CHUNK_SIZE);
         if (isSeaChunk) {
-            // Large Sea Plane
+            // Ocean Plane
             const seaGeo = new THREE.PlaneGeometry(CHUNK_SIZE, CHUNK_SIZE);
             const seaMat = new THREE.MeshStandardMaterial({
                 color: theme.water, roughness: 0.1, metalness: 0.5, transparent: true, opacity: 0.92,
@@ -953,66 +1235,55 @@ if (isset($pdo)) {
             chunkGroup.add(sea);
 
             // Sandy Beach
-            const beachGeo = new THREE.PlaneGeometry(CHUNK_SIZE, 14);
+            const beachGeo = new THREE.PlaneGeometry(CHUNK_SIZE, 15);
             const beachMat = new THREE.MeshStandardMaterial({ color: 0xfde047, roughness: 0.9 });
             const beach = new THREE.Mesh(beachGeo, beachMat);
-            beach.rotation.x = -Math.PI / 2; beach.position.set(originX, 0.08, originZ + CHUNK_SIZE/2 - 7);
+            beach.rotation.x = -Math.PI / 2; beach.position.set(originX, 0.08, originZ + CHUNK_SIZE/2 - 7.5);
             chunkGroup.add(beach);
 
-            // Palm Trees on Beach
+            // Palm Trees
             for (let p = 0; p < 4; p++) {
                 seed++;
-                const px = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 10);
-                const pz = originZ + CHUNK_SIZE/2 - 7 + (seededRandom(seed+1) - 0.5) * 6;
+                const px = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
+                const pz = originZ + CHUNK_SIZE/2 - 7.5 + (seededRandom(seed+1) - 0.5) * 6;
 
                 const palmGroup = new THREE.Group();
-                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.35, 3.5, 8), new THREE.MeshStandardMaterial({ color: 0x78350f }));
-                trunk.position.y = 1.75;
-                const leaves = new THREE.Mesh(new THREE.SphereGeometry(1.6, 8, 6), new THREE.MeshStandardMaterial({ color: 0x15803d }));
-                leaves.scale.set(1.5, 0.4, 1.5); leaves.position.y = 3.5;
+                const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.38, 3.8, 8), new THREE.MeshStandardMaterial({ color: 0x78350f }));
+                trunk.position.y = 1.9;
+                const leaves = new THREE.Mesh(new THREE.SphereGeometry(1.8, 8, 6), new THREE.MeshStandardMaterial({ color: 0x15803d }));
+                leaves.scale.set(1.6, 0.45, 1.6); leaves.position.y = 3.8;
                 palmGroup.add(trunk, leaves);
                 palmGroup.position.set(px, 0, pz);
                 chunkGroup.add(palmGroup);
             }
 
-            // Animated Sea Ship / Boat
+            // Spawn Animated Ship
             seed++;
-            if (seededRandom(seed) > 0.3) {
-                const shipGroup = new THREE.Group();
-                const hullGeo = new THREE.BoxGeometry(8, 2.2, 3.2);
-                const hullMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.4 });
-                const hull = new THREE.Mesh(hullGeo, hullMat);
-                hull.position.y = 1.1; hull.castShadow = true;
-                shipGroup.add(hull);
-
-                const cabin = new THREE.Mesh(new THREE.BoxGeometry(3.5, 2.0, 2.4), new THREE.MeshStandardMaterial({ color: 0xf8fafc }));
-                cabin.position.set(-1, 2.8, 0); shipGroup.add(cabin);
-
-                shipGroup.position.set(originX + (seededRandom(seed+1)-0.5)*(CHUNK_SIZE-20), 0.1, originZ + (seededRandom(seed+2)-0.5)*(CHUNK_SIZE-20));
-                shipGroup.userData = { bobOffset: Math.random()*Math.PI*2, speedX: (Math.random()-0.5)*0.08 };
-                scene.add(shipGroup);
-                activeShips.push(shipGroup);
+            if (seededRandom(seed) > 0.25) {
+                const ship = createUltraDetailedShip(originX, originZ, seed);
+                scene.add(ship);
+                activeShips.push(ship);
             }
         }
 
-        // 4. LAKES, PONDS & WATERFALLS (Hồ ao & Cây xanh)
+        // 4. LAKES & PONDS
         seed++;
-        if (!isSeaChunk && seededRandom(seed) > 0.5) {
-            const pondRadius = 6 + seededRandom(seed+1) * 8;
-            const pondGeo = new THREE.CircleGeometry(pondRadius, 24);
+        if (!isSeaChunk && seededRandom(seed) > 0.48) {
+            const pondRadius = 7 + seededRandom(seed+1) * 9;
+            const pondGeo = new THREE.CircleGeometry(pondRadius, 28);
             const pondMat = new THREE.MeshStandardMaterial({
-                color: theme.water, roughness: 0.15, metalness: 0.3, transparent: true, opacity: 0.9,
+                color: theme.water, roughness: 0.12, metalness: 0.3, transparent: true, opacity: 0.92,
                 emissive: theme.emissiveWater, emissiveIntensity: theme.emissiveIntensity
             });
             const pond = new THREE.Mesh(pondGeo, pondMat);
             pond.rotation.x = -Math.PI / 2;
-            const pondX = originX + (seededRandom(seed+2) - 0.5) * (CHUNK_SIZE - 20);
-            const pondZ = originZ + (seededRandom(seed+3) - 0.5) * (CHUNK_SIZE - 20);
+            const pondX = originX + (seededRandom(seed+2) - 0.5) * (CHUNK_SIZE - 22);
+            const pondZ = originZ + (seededRandom(seed+3) - 0.5) * (CHUNK_SIZE - 22);
             pond.position.set(pondX, 0.06, pondZ);
             chunkGroup.add(pond);
 
-            // Lilypads on pond
-            for (let l = 0; l < 3; l++) {
+            // Lilypads
+            for (let l = 0; l < 4; l++) {
                 seed++;
                 const pad = new THREE.Mesh(new THREE.CircleGeometry(0.6 + seededRandom(seed)*0.4, 8), new THREE.MeshStandardMaterial({ color: 0x22c55e }));
                 pad.rotation.x = -Math.PI / 2;
@@ -1021,19 +1292,19 @@ if (isset($pdo)) {
             }
         }
 
-        // 5. TREES & ROCKS GENERATION
-        for (let t = 0; t < 10; t++) {
+        // 5. TREES GENERATION
+        for (let t = 0; t < 12; t++) {
             seed++;
-            const tx = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
+            const tx = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 14);
             seed++;
-            const tz = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 12);
+            const tz = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 14);
 
             const treeGroup = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 2.8, 8), new THREE.MeshStandardMaterial({ color: theme.treeTrunk, roughness: 0.9 }));
-            trunk.position.y = 1.4; trunk.castShadow = true;
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.52, 3.0, 8), new THREE.MeshStandardMaterial({ color: theme.treeTrunk, roughness: 0.9 }));
+            trunk.position.y = 1.5; trunk.castShadow = true;
 
-            const foliage = new THREE.Mesh(new THREE.ConeGeometry(2.0, 3.2, 8), new THREE.MeshStandardMaterial({ color: theme.treeLeaf, roughness: 0.6 }));
-            foliage.position.y = 3.2; foliage.castShadow = true;
+            const foliage = new THREE.Mesh(new THREE.ConeGeometry(2.2, 3.5, 8), new THREE.MeshStandardMaterial({ color: theme.treeLeaf, roughness: 0.6 }));
+            foliage.position.y = 3.5; foliage.castShadow = true;
 
             treeGroup.add(trunk, foliage);
             treeGroup.position.set(tx, 0, tz);
@@ -1046,22 +1317,21 @@ if (isset($pdo)) {
         return chunkGroup;
     }
 
-    // SPAWN WILDLIFE ANIMALS
     function spawnAnimalsInChunk(cx, cz, chunkGroup, mapKey, seedBase) {
         const originX = cx * CHUNK_SIZE;
         const originZ = cz * CHUNK_SIZE;
-        let seed = seedBase + 555;
+        let seed = seedBase + 777;
 
         for (let i = 0; i < 3; i++) {
             seed++;
-            const ax = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 16);
+            const ax = originX + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 18);
             seed++;
-            const az = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 16);
+            const az = originZ + (seededRandom(seed) - 0.5) * (CHUNK_SIZE - 18);
 
             let animalGroup = new THREE.Group();
             const matR = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.6 });
-            const body = new THREE.Mesh(new THREE.SphereGeometry(0.38, 10, 10), matR);
-            body.position.y = 0.38; body.castShadow = true;
+            const body = new THREE.Mesh(new THREE.SphereGeometry(0.4, 10, 10), matR);
+            body.position.y = 0.4; body.castShadow = true;
             animalGroup.add(body);
 
             animalGroup.position.set(ax, 0, az);
@@ -1158,9 +1428,9 @@ if (isset($pdo)) {
 
         while (foods.length < 40) {
             let itemGroup = new THREE.Group();
-            const appleGeo = new THREE.SphereGeometry(0.6, 16, 16);
+            const appleGeo = new THREE.SphereGeometry(0.65, 16, 16);
             const appleMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.2 });
-            const apple = new THREE.Mesh(appleGeo, appleMat); apple.position.y = 0.6; apple.castShadow = true;
+            const apple = new THREE.Mesh(appleGeo, appleMat); apple.position.y = 0.65; apple.castShadow = true;
             itemGroup.add(apple);
 
             const angle = Math.random() * Math.PI * 2;
@@ -1192,10 +1462,9 @@ if (isset($pdo)) {
             }
 
             if (dx !== 0 || dz !== 0) {
-                const speed = 0.34;
+                const speed = 0.35;
                 
                 if (isFirstPerson) {
-                    // WASD Movement relative to First Person Yaw Angle
                     const forwardX = -Math.sin(fpYaw);
                     const forwardZ = -Math.cos(fpYaw);
                     const rightX = Math.cos(fpYaw);
@@ -1225,11 +1494,9 @@ if (isset($pdo)) {
 
             // CAMERA CONTROLLER: FIRST PERSON VS THIRD PERSON
             if (isFirstPerson) {
-                // Position Camera inside Duck's Head / Eyes
                 const headPosY = duckGroup.position.y + 2.3;
                 camera.position.set(duckGroup.position.x, headPosY, duckGroup.position.z + 0.3);
 
-                // Calculate Look At Direction vector from fpYaw & fpPitch
                 const dirX = Math.sin(fpYaw) * Math.cos(fpPitch);
                 const dirY = Math.sin(fpPitch);
                 const dirZ = Math.cos(fpYaw) * Math.cos(fpPitch);
@@ -1240,19 +1507,16 @@ if (isset($pdo)) {
                     camera.position.z - dirZ * 10
                 );
             } else {
-                // Smooth 3D Orbit Camera Follow
                 camera.position.x = THREE.MathUtils.lerp(camera.position.x, duckGroup.position.x, 0.08);
                 camera.position.z = THREE.MathUtils.lerp(camera.position.z, duckGroup.position.z + 28, 0.08);
                 camera.position.y = THREE.MathUtils.lerp(camera.position.y, duckGroup.position.y + 22, 0.08);
                 camera.lookAt(duckGroup.position.x, 1, duckGroup.position.z);
             }
 
-            // Sun light follows player position for continuous dynamic shadows
             if (dirLight) {
-                dirLight.position.set(duckGroup.position.x + 40, 60, duckGroup.position.z + 40);
+                dirLight.position.set(duckGroup.position.x + 45, 65, duckGroup.position.z + 45);
             }
 
-            // Update Chunks & Foods dynamically
             updateWorldChunksAroundPlayer(duckGroup.position.x, duckGroup.position.z);
             maintainFruitsAroundPlayer(duckGroup.position.x, duckGroup.position.z);
 
@@ -1289,7 +1553,6 @@ if (isset($pdo)) {
             });
         }
 
-        // Rotate Weather Particles
         if (activeParticles) {
             activeParticles.rotation.y += 0.0008;
         }
