@@ -5,7 +5,7 @@ $hasDiscount  = ($prod['discount_price'] > 0);
 $displayPrice = $hasDiscount ? $prod['discount_price'] : $prod['price'];
 $pct = $hasDiscount ? round((($prod['price'] - $prod['discount_price']) / $prod['price']) * 100) : 0;
 ?>
-<div class="product-card">
+<div class="product-card" data-product-id="<?php echo $prod['id']; ?>">
     <?php if ($hasDiscount): ?>
         <span class="product-badge">-<?php echo $pct; ?>% <span data-i18n="product_off_label">Off</span></span>
     <?php elseif (!empty($prod['is_featured'])): ?>
@@ -24,10 +24,10 @@ $pct = $hasDiscount ? round((($prod['price'] - $prod['discount_price']) / $prod[
 
     <div class="product-info">
         <span class="product-cat"><?php echo htmlspecialchars($prod['category_name']); ?></span>
-        <h3 class="product-title">
+        <h3 class="product-title" data-product-name>
             <a href="/detail.php?id=<?php echo $prod['id']; ?>"><?php echo htmlspecialchars($prod['name']); ?></a>
         </h3>
-        <p class="product-desc"><?php echo htmlspecialchars($prod['description']); ?></p>
+        <p class="product-desc" data-product-desc><?php echo htmlspecialchars($prod['description']); ?></p>
         <div class="product-footer">
             <div class="price-box">
                 <?php if ($hasDiscount): ?>

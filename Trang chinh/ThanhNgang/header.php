@@ -383,6 +383,120 @@ if (isset($_SESSION['user_id'])) {
         }
     };
 
+    // ===== PRODUCT NAME & DESCRIPTION TRANSLATIONS =====
+    // Keyed by product ID. 'vi' is the default (already rendered by PHP).
+    const productTranslations = {
+        1: {
+            vi:  { name: 'Cà Phê Sữa Đá Sài Gòn',        desc: 'Cà phê Robusta đậm đặc pha phin kết hợp với sữa đặc có đường và đá nhuyễn.' },
+            en:  { name: 'Saigon Iced Milk Coffee',        desc: 'Strong Robusta drip coffee blended with sweetened condensed milk and crushed ice.' },
+            ja:  { name: 'サイゴン アイスミルクコーヒー',  desc: 'ロブスタのドリップコーヒーと練乳を合わせたベトナム式アイスコーヒー。' },
+            zh:  { name: '西贡冰牛奶咖啡',                  desc: '浓郁罗布斯塔滴漏咖啡搭配炼乳和碎冰，经典越南风味。' }
+        },
+        2: {
+            vi:  { name: 'Cà Phê Đen Đá Pha Phin',        desc: 'Cà phê đen nguyên chất pha phin truyền thống, hương vị đậm đà mộc mạc.' },
+            en:  { name: 'Traditional Black Iced Coffee',  desc: 'Pure black drip coffee with a bold, rustic flavour over ice.' },
+            ja:  { name: 'ブラックアイスコーヒー（ドリップ）', desc: 'ドリップ式で淹れた純粋なブラックコーヒー。氷で冷やした力強い一杯。' },
+            zh:  { name: '传统黑冰咖啡',                    desc: '纯正滴漏黑咖啡，口感浓郁醇厚，加冰享用。' }
+        },
+        3: {
+            vi:  { name: 'Bạc Xỉu Đá Thơm Béo',           desc: 'Nhiều sữa ít cà phê, sự lựa chọn ngọt ngào cho ngày mới nhẹ nhàng.' },
+            en:  { name: 'Creamy Iced Milk Coffee (Bạc Xỉu)', desc: 'More milk, less coffee — a sweet and gentle start to any day.' },
+            ja:  { name: 'バクシウ アイスミルクコーヒー',  desc: 'ミルク多め・コーヒー少なめ。やさしくて甘い一杯。' },
+            zh:  { name: '冰鲜奶咖啡（白咖啡）',            desc: '多奶少咖啡，甜美醇香，轻松开启新一天。' }
+        },
+        4: {
+            vi:  { name: 'Cà Phê Muối Huế',                desc: 'Cà phê phin kết hợp lớp kem muối béo mặn độc đáo và đậm đà.' },
+            en:  { name: 'Hue Salted Coffee',               desc: 'Drip coffee topped with a rich, uniquely savoury salted cream.' },
+            ja:  { name: 'フエ 塩コーヒー',                 desc: 'ドリップコーヒーに塩味クリームをのせた、フエ発祥のユニークなコーヒー。' },
+            zh:  { name: '顺化盐焦糖咖啡',                  desc: '滴漏咖啡搭配咸味奶盖，独特浓郁，风味绝妙。' }
+        },
+        5: {
+            vi:  { name: 'Trà Sữa Trân Châu Hoàng Gia',   desc: 'Trà sữa truyền thống đậm vị trà cùng trân châu đen dai giòn ngọt lịm.' },
+            en:  { name: 'Royal Pearl Milk Tea',            desc: 'Classic milk tea with rich tea flavour and chewy black tapioca pearls.' },
+            ja:  { name: 'ロイヤル パールミルクティー',     desc: '濃いミルクティーと弾力のある黒タピオカパールの組み合わせ。' },
+            zh:  { name: '皇家珍珠奶茶',                    desc: '浓郁奶茶搭配弹牙黑珍珠，经典甘甜，回味无穷。' }
+        },
+        6: {
+            vi:  { name: 'Trà Sữa Ô Long Kem Cheese',     desc: 'Trà sữa ô long thơm nhẹ kết hợp với lớp kem sữa phô mai mặn béo.' },
+            en:  { name: 'Oolong Cheese Cream Milk Tea',   desc: 'Delicate oolong milk tea topped with a rich, savoury cheese cream.' },
+            ja:  { name: 'ウーロンチーズクリームミルクティー', desc: '香り高いウーロンティーにチーズクリームをトッピングした贅沢な一杯。' },
+            zh:  { name: '乌龙芝士奶盖奶茶',                desc: '清香乌龙奶茶搭配咸香芝士奶盖，层次丰富。' }
+        },
+        7: {
+            vi:  { name: 'Trà Sữa Matcha Nhật Bản',        desc: 'Bột trà xanh Uji nhập khẩu trực tiếp từ Nhật Bản kết hợp sữa tươi béo.' },
+            en:  { name: 'Japanese Matcha Milk Tea',        desc: 'Imported Uji matcha powder blended with fresh creamy milk.' },
+            ja:  { name: '日本産 抹茶ミルクティー',          desc: '宇治産抹茶パウダーを使った本格抹茶ミルクティー。' },
+            zh:  { name: '日本抹茶奶茶',                    desc: '采用进口宇治抹茶粉，搭配新鲜浓郁牛奶，清新醇厚。' }
+        },
+        8: {
+            vi:  { name: 'Trà Đào Cam Sả Đặc Biệt',       desc: 'Trà đào thanh ngọt kết hợp sả tươi thơm nồng và những lát cam vàng mọng nước.' },
+            en:  { name: 'Special Peach Orange Lemongrass Tea', desc: 'Sweet peach tea with aromatic lemongrass and juicy orange slices.' },
+            ja:  { name: 'ピーチ＆オレンジ レモングラスティー', desc: '甘いピーチティーにレモングラスとオレンジスライスをあわせた爽やかな一杯。' },
+            zh:  { name: '特调蜜桃橙子香茅茶',              desc: '清甜蜜桃茶搭配新鲜香茅与多汁橙片，清爽解渴。' }
+        },
+        9: {
+            vi:  { name: 'Trà Vải Lài Hạt Chia',           desc: 'Trà lài thanh mát kết hợp với quả vải ngâm ngọt lịm và hạt chia bổ dưỡng.' },
+            en:  { name: 'Lychee Jasmine Chia Tea',         desc: 'Refreshing jasmine tea with sweet lychee and nutritious chia seeds.' },
+            ja:  { name: 'ライチ ジャスミン チアティー',     desc: '爽やかなジャスミンティーに甘いライチとチアシードを加えた健康的な一杯。' },
+            zh:  { name: '荔枝茉莉奇亚籽茶',                desc: '清新茉莉茶搭配甜蜜荔枝与营养奇亚籽，健康美味。' }
+        },
+        10: {
+            vi:  { name: 'Trà Dâu Tằm Pha Lê',             desc: 'Trà dâu tằm chua ngọt, kèm trân châu 3Q trắng pha lê giòn sần sật.' },
+            en:  { name: 'Crystal Mulberry Tea',            desc: 'Sweet-sour mulberry tea with chewy white crystal tapioca pearls.' },
+            ja:  { name: 'クリスタル マルベリーティー',      desc: '甘酸っぱいマルベリーティーとプルプルの白クリスタルタピオカ。' },
+            zh:  { name: '水晶桑葚果茶',                    desc: '酸甜桑葚茶搭配弹牙水晶白珍珠，口感丰富。' }
+        },
+        11: {
+            vi:  { name: 'Matcha Đá Xay Thượng Hạng',      desc: 'Trà xanh Nhật Bản xay cùng đá, phủ kem whipping cream béo ngậy.' },
+            en:  { name: 'Premium Matcha Ice Blended',      desc: 'Japanese green tea blended with ice and topped with whipped cream.' },
+            ja:  { name: 'プレミアム 抹茶フラペチーノ',      desc: '日本産抹茶を氷と一緒にブレンドし、ホイップクリームをトッピング。' },
+            zh:  { name: '顶级抹茶冰沙',                    desc: '日本抹茶与冰块混合，顶部铺满浓郁鲜奶油。' }
+        },
+        12: {
+            vi:  { name: 'Cà Phê Cốt Dừa Đá Xay',          desc: 'Cà phê espresso đậm đà hòa quyện cùng sữa dừa béo ngậy xay mịn.' },
+            en:  { name: 'Coconut Coffee Ice Blended',       desc: 'Bold espresso blended with rich coconut milk into a smooth frozen drink.' },
+            ja:  { name: 'ココナッツコーヒー フラペチーノ',  desc: '濃厚エスプレッソとクリーミーなココナッツミルクをブレンドしたアイスドリンク。' },
+            zh:  { name: '椰香咖啡冰沙',                    desc: '浓缩咖啡与浓郁椰奶混合冰打，顺滑香甜。' }
+        },
+        13: {
+            vi:  { name: 'Chanh Tuyết Đá Xay Giải Nhiệt',  desc: 'Chanh tươi nguyên vỏ xay nhuyễn cùng sữa đặc và đá bào tạo lớp tuyết trắng.' },
+            en:  { name: 'Frozen Lemon Snow Slush',         desc: 'Whole fresh lemon blended with condensed milk and crushed ice for a snowy treat.' },
+            ja:  { name: 'フローズン レモンスノースラッシュ', desc: 'レモン丸ごと、練乳、クラッシュアイスをブレンドした爽快ドリンク。' },
+            zh:  { name: '柠檬雪沙冰饮',                    desc: '整只鲜柠檬搭配炼乳与碎冰，打出雪白清爽冰沙。' }
+        },
+        14: {
+            vi:  { name: 'Trân Châu Đen Đường Đen',        desc: 'Trân châu đen dẻo dai rim mật đường đen thơm ngọt.' },
+            en:  { name: 'Black Sugar Tapioca Pearls',       desc: 'Chewy black tapioca pearls simmered in fragrant brown sugar syrup.' },
+            ja:  { name: 'ブラックシュガー タピオカパール',  desc: '黒糖シロップで煮たもちもちの黒タピオカ。' },
+            zh:  { name: '黑糖珍珠',                        desc: '弹牙黑珍珠以黑糖糖浆慢煮，香甜浓郁。' }
+        },
+        15: {
+            vi:  { name: 'Trân Châu Trắng 3Q',              desc: 'Trân châu 3Q giòn sần sật ngọt nhẹ thanh mát.' },
+            en:  { name: 'White Crystal 3Q Pearls',          desc: 'Crunchy white 3Q pearls with a light, refreshing sweetness.' },
+            ja:  { name: 'ホワイト クリスタル 3Q パール',   desc: 'プチプチ食感の白い3Qパール。爽やかな甘さ。' },
+            zh:  { name: '水晶白珍珠3Q',                    desc: '弹嫩水晶白3Q珍珠，清甜爽口。' }
+        },
+        16: {
+            vi:  { name: 'Kem Phô Mai Cheese Salted',       desc: 'Lớp kem béo mặn mịn màng phủ trên bề mặt ly nước.' },
+            en:  { name: 'Salted Cheese Cream Topping',      desc: 'A silky, savoury salted cheese cream layer on top of your drink.' },
+            ja:  { name: '塩チーズクリーム トッピング',      desc: 'なめらかな塩チーズクリームを飲み物の上にのせたトッピング。' },
+            zh:  { name: '咸芝士奶盖',                      desc: '丝滑咸香芝士奶盖，浮于饮品表面，咸甜交织。' }
+        }
+    };
+
+    function applyProductLanguage(lang) {
+        document.querySelectorAll('.product-card[data-product-id]').forEach(function(card) {
+            const pid = parseInt(card.getAttribute('data-product-id'), 10);
+            const trans = productTranslations[pid];
+            if (!trans) return;
+            const t = trans[lang] || trans['vi'];
+            const nameEl = card.querySelector('[data-product-name] a');
+            const descEl = card.querySelector('[data-product-desc]');
+            if (nameEl && t.name) nameEl.textContent = t.name;
+            if (descEl && t.desc) descEl.textContent = t.desc;
+        });
+    }
+
     function syncLanguageButtons(lang) {
         document.querySelectorAll('.lang-pill').forEach((button) => {
             button.classList.toggle('active', button.dataset.lang === lang);
@@ -415,6 +529,9 @@ if (isset($_SESSION['user_id'])) {
             menuTitle.innerHTML = dictionary.menu_title;
         }
 
+        // Translate product names & descriptions client-side (no reload needed)
+        applyProductLanguage(lang);
+
         syncLanguageButtons(lang);
     }
 
@@ -424,10 +541,9 @@ if (isset($_SESSION['user_id'])) {
                 const lang = button.dataset.lang;
                 applyLanguage(lang);
                 try { localStorage.setItem('site_lang', lang); } catch(e){}
-                // Persist selection server-side via cookie so PHP can render products in that language.
+                // Persist cookie for server-side usage (e.g. detail page)
                 try { document.cookie = 'site_lang=' + lang + '; path=/; max-age=' + (60*60*24*365); } catch(e) {}
-                // reload to let server render localized product names/descriptions
-                setTimeout(() => { location.reload(); }, 120);
+                // No full page reload needed — product names are translated client-side
             });
         });
         const saved = (function(){ try { return localStorage.getItem('site_lang'); } catch(e){ return null; } })();
