@@ -1,13 +1,12 @@
 <!-- 3D DUCK AI ASSISTANT MASCOT FOR GLOWDRINKS -->
 <style>
-/* Duck AI Floating Widget Container - Moves horizontally */
+/* Duck AI Floating Widget Container - Fixed at bottom right */
 .duck-ai-widget {
     position: fixed;
-    bottom: 20px;
-    right: 25px;
+    bottom: 24px;
+    right: 28px;
     z-index: 99999;
     font-family: inherit;
-    transition: right 0.1s linear, left 0.1s linear;
 }
 
 /* 3D Duck Container & Ground Shadow */
@@ -27,7 +26,7 @@
     background: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
     filter: blur(4px);
-    animation: shadowWaddle 0.5s ease-in-out infinite alternate;
+    animation: shadowFloat 3s ease-in-out infinite alternate;
 }
 
 /* 3D Duck Image & Waddling Animation */
@@ -43,7 +42,7 @@
     align-items: center;
     justify-content: center;
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-    animation: duckWaddleStep 0.5s ease-in-out infinite alternate;
+    animation: duckFloat 3s ease-in-out infinite;
     position: relative;
     padding: 0;
     overflow: visible;
@@ -55,12 +54,14 @@
 }
 
 .duck-avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-    transition: transform 0.2s ease;
+    width: 88%;
+    height: 88%;
+    object-fit: contain;
+    border-radius: 0;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.18));
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    user-select: none;
 }
 
 /* Waving Arm Badge 🖐️ */
@@ -344,35 +345,37 @@
     transform: scale(1.08);
 }
 
-/* 3D WALKING & WADDLING KEYFRAME ANIMATIONS */
-@keyframes duckWaddleStep {
-    0% { transform: translateY(0) rotate(-6deg); }
-    100% { transform: translateY(-7px) rotate(6deg); }
+/* DUCK FLOAT & INTERACTION KEYFRAME ANIMATIONS */
+@keyframes duckFloat {
+    0%   { transform: translateY(0px); }
+    50%  { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
 }
 
-@keyframes shadowWaddle {
-    0% { transform: translateX(-50%) scale(1); opacity: 0.25; }
-    100% { transform: translateX(-50%) scale(0.75); opacity: 0.12; }
+@keyframes shadowFloat {
+    0%   { transform: translateX(-50%) scale(1);    opacity: 0.22; }
+    50%  { transform: translateX(-50%) scale(0.78); opacity: 0.10; }
+    100% { transform: translateX(-50%) scale(1);    opacity: 0.22; }
 }
 
 @keyframes wingWave {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(28deg); }
+    0%   { transform: rotate(-5deg); }
+    100% { transform: rotate(25deg); }
 }
 
 @keyframes headerDuckJump {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    50%      { transform: translateY(-5px); }
 }
 
 @keyframes bubblePop {
-    0% { transform: scale(0.5) translateY(15px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
+    0%   { transform: scale(0.5) translateY(15px); opacity: 0; }
+    100% { transform: scale(1)   translateY(0);    opacity: 1; }
 }
 
 @keyframes chatOpen {
-    0% { transform: scale(0.7) translateY(40px); opacity: 0; }
-    100% { transform: scale(1) translateY(0); opacity: 1; }
+    0%   { transform: scale(0.7) translateY(40px); opacity: 0; }
+    100% { transform: scale(1)   translateY(0);    opacity: 1; }
 }
 </style>
 
@@ -380,18 +383,54 @@
 <div class="duck-ai-widget" id="duck-ai-widget">
     <!-- Speech Bubble Following 3D Duck -->
     <div class="duck-speech-bubble" id="duck-speech-bubble" onclick="toggleDuckChat()">
-        <strong data-i18n="duck_bubble_title">🦆 Vịt AI đang đi dạo! 👋</strong>
-        <span id="duck-bubble-text" data-i18n="duck_bubble_text">Chào! Tớ là trợ lý Vịt AI. Tớ đi quanh trang để giúp bạn — hỏi mình bất kỳ điều gì nhé!</span>
+        <strong data-i18n="duck_bubble_title">🦆 Vịt AI xin chào! 👋</strong>
+        <span id="duck-bubble-text" data-i18n="duck_bubble_text">Chào! Tớ là trợ lý Vịt AI. Hỏi mình bất kỳ điều gì nhé!</span>
     </div>
 
-    <!-- 3D Duck Wrapper with Ground Shadow -->
+    <!-- Duck Wrapper with Ground Shadow -->
     <div class="duck-3d-wrapper" onclick="toggleDuckChat()">
         <div class="duck-ground-shadow"></div>
         <button class="duck-avatar-btn" id="duck-avatar-btn" title="Trợ Lý Vịt AI">
             <span class="duck-waving-wing">👋</span>
-            <!-- Lottie animation container (preferred) + fallback img -->
-            <div id="anime-lottie" style="width:100%;height:100%;border-radius:50%;overflow:hidden;"></div>
-            <img id="anime-fallback" src="/anh/duck_3d.png" alt="Duck AI Mascot" class="duck-avatar-img" style="display:none;" onerror="this.style.display='none'">
+            <!-- Duck SVG avatar -->
+            <svg class="duck-avatar-img" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- Body -->
+              <ellipse cx="60" cy="80" rx="34" ry="28" fill="#FFD700"/>
+              <!-- Belly -->
+              <ellipse cx="60" cy="86" rx="22" ry="18" fill="#FFF3B0"/>
+              <!-- Head -->
+              <circle cx="60" cy="44" r="24" fill="#FFD700"/>
+              <!-- Left eye white -->
+              <circle cx="50" cy="40" r="7" fill="white"/>
+              <!-- Right eye white -->
+              <circle cx="70" cy="40" r="7" fill="white"/>
+              <!-- Left eye pupil -->
+              <circle cx="52" cy="41" r="4" fill="#1a1a2e"/>
+              <!-- Right eye pupil -->
+              <circle cx="72" cy="41" r="4" fill="#1a1a2e"/>
+              <!-- Left eye shine -->
+              <circle cx="53" cy="39" r="1.5" fill="white"/>
+              <!-- Right eye shine -->
+              <circle cx="73" cy="39" r="1.5" fill="white"/>
+              <!-- Beak top -->
+              <ellipse cx="60" cy="54" rx="10" ry="5" fill="#FF8C00"/>
+              <!-- Beak bottom -->
+              <ellipse cx="60" cy="57" rx="10" ry="4" fill="#FF6B00"/>
+              <!-- Left wing -->
+              <ellipse cx="30" cy="80" rx="10" ry="18" fill="#FFC200" transform="rotate(-15 30 80)"/>
+              <!-- Right wing -->
+              <ellipse cx="90" cy="80" rx="10" ry="18" fill="#FFC200" transform="rotate(15 90 80)"/>
+              <!-- Left foot -->
+              <ellipse cx="48" cy="108" rx="10" ry="5" fill="#FF8C00"/>
+              <!-- Right foot -->
+              <ellipse cx="72" cy="108" rx="10" ry="5" fill="#FF8C00"/>
+              <!-- GlowDrinks cup -->
+              <rect x="70" y="72" width="18" height="22" rx="3" fill="#E8622A" opacity="0.9"/>
+              <rect x="68" y="70" width="22" height="5" rx="2" fill="#F5A623"/>
+              <rect x="72" y="68" width="6" height="4" rx="1" fill="#F5A623"/>
+              <!-- Cup straw -->
+              <line x1="82" y1="68" x2="84" y2="55" stroke="#4CAF50" stroke-width="2" stroke-linecap="round"/>
+            </svg>
             <span class="duck-online-dot"></span>
         </button>
     </div>
@@ -401,9 +440,8 @@
         <!-- Header -->
         <div class="duck-chat-header">
             <div class="duck-chat-header-info">
-                <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;">
-                    <div id="anime-header-lottie" style="width:44px;height:44px"></div>
-                    <img id="anime-header-fallback" src="/anh/duck_3d.png" alt="Duck AI" class="duck-chat-header-img" style="display:none;" onerror="this.style.display='none'">
+                <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-size:1.9rem;line-height:1;">🦆</span>
                 </div>
                 <div class="duck-chat-header-text">
                     <h4 data-i18n="duck_header_title">Vịt AI</h4>
@@ -417,9 +455,8 @@
         <div class="duck-chat-body" id="duck-chat-body">
             <!-- Welcome Message -->
             <div class="duck-msg ai">
-                <div style="width:35px;height:35px;border-radius:50%;overflow:hidden;">
-                    <div id="anime-msg-lottie" style="width:35px;height:35px"></div>
-                    <img id="anime-msg-fallback" src="/anh/duck_3d.png" class="duck-msg-avatar" style="display:none;" onerror="this.style.display='none'">
+                <div style="width:35px;height:35px;border-radius:50%;overflow:hidden;background:#FFF3B0;border:1.5px solid #f5a623;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <span style="font-size:1.4rem;line-height:1;">🦆</span>
                 </div>
                 <div class="duck-msg-bubble" data-i18n="duck_welcome_html">
                     Xin chào! 👋 Chào mừng bạn đến với <strong>GlowDrinks</strong>!<br><br>
@@ -474,63 +511,20 @@ function playDuckQuackSound() {
     }
 }
 
-// WALKING SYSTEM VARIABLES
-let duckPos = 25; // current position from right in px
-let duckDir = -1; // -1: walking left, 1: walking right
-let isDuckWalking = true;
-let duckWalkInterval = null;
-
-function startDuckWalking() {
-    if (duckWalkInterval) clearInterval(duckWalkInterval);
-
-    const widget = document.getElementById('duck-ai-widget');
-    const imgEl  = document.getElementById('duck-img-el');
-    const bubble = document.getElementById('duck-speech-bubble');
-    if (!widget) return;
-
-    const maxWalk = Math.min(window.innerWidth - 120, 600); // Walk range up to 600px
-
-    duckWalkInterval = setInterval(function() {
-        if (!isDuckWalking) return;
-
-        // Advance position
-        duckPos += (duckDir * 2.5); // speed
-
-        // Reach left boundary -> Turn around to right
-        if (duckPos >= maxWalk) {
-            duckPos = maxWalk;
-            duckDir = -1; // turn rightward
-            if (imgEl) imgEl.style.transform = 'scaleX(1)';
-            if (bubble) bubble.style.right = '0';
-        }
-        // Reach right boundary -> Turn around to left
-        else if (duckPos <= 25) {
-            duckPos = 25;
-            duckDir = 1; // turn leftward
-            if (imgEl) imgEl.style.transform = 'scaleX(-1)';
-            if (bubble) bubble.style.right = '0';
-        }
-
-        widget.style.right = duckPos + 'px';
-    }, 50);
-}
-
+// Duck is fixed — no walking system needed
 function toggleDuckChat() {
-    const win = document.getElementById('duck-chat-window');
+    const win    = document.getElementById('duck-chat-window');
     const bubble = document.getElementById('duck-speech-bubble');
-    const btn = document.getElementById('duck-avatar-btn');
     if (!win) return;
-    
+
     playDuckQuackSound();
 
     if (win.style.display === 'flex') {
         win.style.display = 'none';
         if (bubble) bubble.style.display = 'block';
-        isDuckWalking = true; // Resume walking
     } else {
         win.style.display = 'flex';
         if (bubble) bubble.style.display = 'none';
-        isDuckWalking = false; // Stop walking while chatting
     }
 }
 
@@ -576,7 +570,7 @@ function appendDuckMsg(text, sender) {
 
     if (sender === 'ai') {
         div.innerHTML = `
-            <img src="/anh/duck_3d.png" class="duck-msg-avatar" onerror="this.src='/anh/duck_ai.png'">
+            <div style="width:35px;height:35px;border-radius:50%;overflow:hidden;background:#FFF3B0;border:1.5px solid #f5a623;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:1.4rem;line-height:1;">🦆</span></div>
             <div class="duck-msg-bubble">${text}</div>
         `;
     } else {
@@ -621,14 +615,21 @@ function scrollDuckChatBottom() {
     }
 }
 
-// Start 3D Duck walking on page load after 1 second
+// Duck is fixed at bottom-right — no walking needed
 window.addEventListener('DOMContentLoaded', function() {
-    setTimeout(startDuckWalking, 1000);
-    // Load Lottie animations for the anime avatar (if available)
-    setTimeout(loadLottieAnimations, 400);
+    // Auto-hide bubble after 6 seconds
+    setTimeout(function() {
+        const bubble = document.getElementById('duck-speech-bubble');
+        if (bubble) {
+            bubble.style.transition = 'opacity 0.6s ease';
+            bubble.style.opacity = '0';
+            setTimeout(function() { bubble.style.display = 'none'; }, 650);
+        }
+    }, 6000);
 });
 
-// Load lottie-web and initialize containers; fallback to static image if unavailable.
+// Lottie/sprite loaders removed — using SVG avatar instead
+// Kept stub so no ReferenceError if called elsewhere
 function loadLottieAnimations() {
     const lottieCdn = 'https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.10.2/lottie.min.js';
     function showFallback(id) {

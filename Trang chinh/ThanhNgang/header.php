@@ -138,8 +138,8 @@ if (isset($_SESSION['user_id'])) {
             empty_hint: 'Thử tìm kiếm với từ khóa khác hoặc chọn danh mục khác.', back_home_button: '↩ Về trang chủ'
             ,
             // Duck widget translations
-            duck_bubble_title: '🦆 Vịt AI đang đi dạo! 👋',
-            duck_bubble_text: 'Chào! Tớ là trợ lý Vịt AI. Tớ đi quanh trang để giúp bạn — hỏi mình bất kỳ điều gì nhé!',
+            duck_bubble_title: '🦆 Vịt AI xin chào! 👋',
+            duck_bubble_text: 'Chào! Tớ là trợ lý Vịt AI. Hỏi mình bất kỳ điều gì nhé!',
             duck_header_title: 'Vịt AI',
             duck_header_status: '🟢 Trợ lý ảo GlowDrinks (Online)',
             duck_welcome_html: 'Xin chào! 👋 Chào mừng bạn đến với <strong>GlowDrinks</strong>!<br><br>Tớ là trợ lý <strong>Vịt AI</strong>, có thể giúp bạn tìm món, đặt hàng hoặc hướng dẫn thanh toán.<br><br><strong>Bạn cần hỗ trợ gì hôm nay?</strong>',
@@ -201,8 +201,8 @@ if (isset($_SESSION['user_id'])) {
             empty_hint: 'Try another keyword or choose a different category.', back_home_button: '↩ Back home'
             ,
             // Duck widget translations
-            duck_bubble_title: '🦆 Duck AI is strolling! 👋',
-            duck_bubble_text: 'Hi! I am the Duck Assistant. I roam the site to help — ask me anything!',
+            duck_bubble_title: '🦆 Duck AI says hello! 👋',
+            duck_bubble_text: 'Hi! I am the Duck Assistant. Ask me anything!',
             duck_header_title: 'Duck AI',
             duck_header_status: '🟢 GlowDrinks assistant (Online)',
             duck_welcome_html: 'Hello! 👋 Welcome to <strong>GlowDrinks</strong>!<br><br>I am the <strong>Duck Assistant</strong>, I can help with menu, ordering or payment guidance.<br><br><strong>How can I help you today?</strong>',
@@ -263,8 +263,8 @@ if (isset($_SESSION['user_id'])) {
             menu_title: 'おすすめ <span>ドリンク</span>', back_home: '← ホームへ戻る', nothing_found: '商品が見つかりません！',
             empty_hint: '別のキーワードで検索するか、別のカテゴリを選んでください。', back_home_button: '↩ ホームへ戻る'
             ,
-            duck_bubble_title: '🦆 アヒルAIが散歩中！ 👋',
-            duck_bubble_text: 'こんにちは！アヒルアシスタントです。サイト内を回って手伝います—何でも聞いてください！',
+            duck_bubble_title: '🦆 アヒルAIからこんにちは！ 👋',
+            duck_bubble_text: 'こんにちは！アヒルアシスタントです。何でも聞いてください！',
             duck_header_title: 'アヒルAI',
             duck_header_status: '🟢 GlowDrinks アシスタント（オンライン）',
             duck_welcome_html: 'こんにちは！ 👋 <strong>GlowDrinks</strong>へようこそ！<br><br>私は <strong>アヒルアシスタント</strong> です。メニュー、注文、支払いの案内ができます。<br><br><strong>今日は何をお手伝いしましょうか？</strong>',
@@ -325,8 +325,8 @@ if (isset($_SESSION['user_id'])) {
             menu_title: '推荐 <span>饮品</span>', back_home: '← 返回首页', nothing_found: '未找到商品！',
             empty_hint: '请尝试其他关键词或选择其他分类。', back_home_button: '↩ 返回首页'
             ,
-            duck_bubble_title: '🦆 鸭子AI在散步！ 👋',
-            duck_bubble_text: '嗨！我是鸭子助手。我会在网站巡游来帮助你—随时问我任何问题！',
+            duck_bubble_title: '🦆 鸭子AI您好！ 👋',
+            duck_bubble_text: '呐！我是鸭子助手。随时问我任何问题！',
             duck_header_title: '鸭子AI',
             duck_header_status: '🟢 GlowDrinks 助手（在线）',
             duck_welcome_html: '你好！ 👋 欢迎来到 <strong>GlowDrinks</strong>！<br><br>我是 <strong>鸭子助手</strong>，可以帮助你查看菜单、下单或支付说明。<br><br><strong>我今天能为你做些什么？</strong>',
