@@ -388,6 +388,9 @@ if (isset($pdo)) {
                     <label data-i18n="chunk_label">Tọa Độ Chunk</label>
                     <span id="chunk-val" style="color:#c084fc;font-size:1.1rem;">[0, 0]</span>
                 </div>
+                <a href="/Game/farm_game.php" class="btn-leaderboard-toggle" style="background:linear-gradient(135deg, #15803d, #166534);border-color:#4ade80;text-decoration:none;">
+                    🌱 Game Làm Vườn 2D
+                </a>
                 <button class="btn-view-toggle" id="btn-view-toggle" onclick="toggleFirstPersonView()" data-i18n="view_btn">
                     👀 Chế độ 1st Person
                 </button>

@@ -90,6 +90,7 @@ if (isset($_SESSION['user_id'])) {
             <li><a href="/index/?type=products" class="nav-link" data-i18n="nav_menu">Thuc Don</a></li>
             <li><a href="/cart/my_orders.php" class="nav-link" data-i18n="nav_orders">Don Hang</a></li>
             <li><a href="/Game/duck_game.php" target="_blank" class="nav-link" style="color:#f5a623;font-weight:800;" data-i18n="nav_game">🎮 Game Vịt 3D</a></li>
+            <li><a href="/Game/farm_game.php" target="_blank" class="nav-link" style="color:#2e7d32;font-weight:800;" data-i18n="nav_farm">🌱 GlowFarm 2D</a></li>
             <li><a href="/contact.php" class="nav-link" data-i18n="nav_contact">Lien He</a></li>
             <?php if ($current_user && $current_user['role'] === 'admin'): ?>
                 <li><a href="/amin/admin.php" class="nav-link" style="color:#E8622A;font-weight:700;" data-i18n="nav_admin">Quan Tri</a></li>
@@ -132,7 +133,7 @@ if (isset($_SESSION['user_id'])) {
 <script>
     const localeMap = {
         vi: {
-            nav_home: 'Trang Chủ', nav_menu: 'Thực Đơn', nav_orders: 'Đơn Hàng', nav_game: '🎮 Game Vịt 3D', nav_contact: 'Liên Hệ', nav_admin: 'Quản Trị',
+            nav_home: 'Trang Chủ', nav_menu: 'Thực Đơn', nav_orders: 'Đơn Hàng', nav_game: '🎮 Game Vịt 3D', nav_farm: '🌱 GlowFarm 2D', nav_contact: 'Liên Hệ', nav_admin: 'Quản Trị',
             search_btn: 'Tìm', login_btn: 'Đăng Nhập', logout_btn: 'Thoát', greeting: 'Chào',
             menu_title: 'Món Ngon <span>Gợi Ý</span>', back_home: '← Về trang chủ', nothing_found: 'Không tìm thấy sản phẩm!',
             empty_hint: 'Thử tìm kiếm với từ khóa khác hoặc chọn danh mục khác.', back_home_button: '↩ Về trang chủ'
@@ -195,7 +196,7 @@ if (isset($_SESSION['user_id'])) {
             , item_label: 'món'
         },
         en: {
-            nav_home: 'Home', nav_menu: 'Menu', nav_orders: 'Orders', nav_game: '🎮 3D Duck Game', nav_contact: 'Contact', nav_admin: 'Admin',
+            nav_home: 'Home', nav_menu: 'Menu', nav_orders: 'Orders', nav_game: '🎮 3D Duck Game', nav_farm: '🌱 2D GlowFarm', nav_contact: 'Contact', nav_admin: 'Admin',
             search_btn: 'Search', login_btn: 'Login', logout_btn: 'Logout', greeting: 'Hi',
             menu_title: 'Featured <span>Drinks</span>', back_home: '← Back home', nothing_found: 'No products found!',
             empty_hint: 'Try another keyword or choose a different category.', back_home_button: '↩ Back home'
