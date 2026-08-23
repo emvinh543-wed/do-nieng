@@ -259,7 +259,7 @@ if (isset($_SESSION['user_id'])) {
             , item_label: 'items'
         },
         ja: {
-            nav_home: 'ホーム', nav_menu: 'メニュー', nav_orders: '注文', nav_game: '🎮 3Dアヒルゲーム', nav_contact: 'お問い合わせ', nav_admin: '管理',
+            nav_home: 'ホーム', nav_menu: 'メニュー', nav_orders: '注文', nav_game: '🎮 3Dアヒルゲーム', nav_farm: '🌱 GlowFarm 2D農場', nav_contact: 'お問い合わせ', nav_admin: '管理',
             search_btn: '検索', login_btn: 'ログイン', logout_btn: 'ログアウト', greeting: 'こんにちは',
             menu_title: 'おすすめ <span>ドリンク</span>', back_home: '← ホームへ戻る', nothing_found: '商品が見つかりません！',
             empty_hint: '別のキーワードで検索するか、別のカテゴリを選んでください。', back_home_button: '↩ ホームへ戻る'
@@ -321,7 +321,7 @@ if (isset($_SESSION['user_id'])) {
                 , item_label: '件'
         },
         zh: {
-            nav_home: '首页', nav_menu: '菜单', nav_orders: '订单', nav_game: '🎮 3D鸭子游戏', nav_contact: '联系', nav_admin: '管理',
+            nav_home: '首页', nav_menu: '菜单', nav_orders: '订单', nav_game: '🎮 3D鸭子游戏', nav_farm: '🌱 GlowFarm 2D农场', nav_contact: '联系', nav_admin: '管理',
             search_btn: '搜索', login_btn: '登录', logout_btn: '退出', greeting: '你好',
             menu_title: '推荐 <span>饮品</span>', back_home: '← 返回首页', nothing_found: '未找到商品！',
             empty_hint: '请尝试其他关键词或选择其他分类。', back_home_button: '↩ 返回首页'

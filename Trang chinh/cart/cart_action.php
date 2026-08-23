@@ -96,4 +96,59 @@ if ($action === 'delete') {
     }
 }
 
+if ($action === 'apply_voucher') {
+    $code = strtoupper(trim($_POST['code'] ?? ''));
+    if (empty($code)) {
+        echo json_encode(['status' => 'error', 'message' => 'Vui lòng nhập mã giảm giá!']);
+        exit();
+    }
+
+    $discount_pct = 0;
+    // Known game vouchers
+    if ($code === 'GLOWFARM25') {
+        $discount_pct = 25;
+    } elseif ($code === 'GLOWFARM15') {
+        $discount_pct = 15;
+    } elseif ($code === 'GLOWFARM10') {
+        $discount_pct = 10;
+    } elseif ($code === 'GLOWDUCK20') {
+        $discount_pct = 20;
+    } else {
+        // Check database coupons table if available
+        if (isset($pdo)) {
+            try {
+                $stmt = $pdo->prepare("SELECT discount_percent FROM coupons WHERE code = ? AND (expiry_date IS NULL OR expiry_date >= CURDATE())");
+                $stmt->execute([$code]);
+                $c = $stmt->fetch();
+                if ($c) {
+                    $discount_pct = intval($c['discount_percent']);
+                }
+            } catch (Exception $e) {}
+        }
+    }
+
+    if ($discount_pct > 0) {
+        $_SESSION['voucher'] = [
+            'code' => $code,
+            'discount_percent' => $discount_pct
+        ];
+        echo json_encode([
+            'status' => 'success',
+            'code' => $code,
+            'discount_percent' => $discount_pct,
+            'message' => "Áp dụng thành công mã {$code} (Giảm {$discount_pct}%)!"
+        ]);
+        exit();
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Mã giảm giá không hợp lệ hoặc đã hết hạn!']);
+        exit();
+    }
+}
+
+if ($action === 'remove_voucher') {
+    unset($_SESSION['voucher']);
+    echo json_encode(['status' => 'success', 'message' => 'Đã hủy áp dụng voucher.']);
+    exit();
+}
+
 echo json_encode(['status'=>'error','message'=>'Yeu cau khong hop le!']);
