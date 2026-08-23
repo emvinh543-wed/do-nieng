@@ -5,8 +5,14 @@ $cart = $_SESSION['cart'] ?? [];
 if (count($cart) === 0) { header("Location: /index/"); exit(); }
 
 $subtotal = array_sum(array_column($cart, 'total_item_amount'));
-$shipping = ($subtotal > 100000 || $subtotal == 0) ? 0 : 15000;
-$grand    = $subtotal + $shipping;
+$voucher  = $_SESSION['voucher'] ?? null;
+$discount = 0;
+if ($voucher && !empty($voucher['discount_percent'])) {
+    $discount = round($subtotal * ($voucher['discount_percent'] / 100));
+}
+$after_discount = max(0, $subtotal - $discount);
+$shipping = ($after_discount > 100000 || $after_discount == 0) ? 0 : 15000;
+$grand    = $after_discount + $shipping;
 
 $fullname = $current_user['fullname'] ?? '';
 $email    = $current_user['email']    ?? '';
@@ -21,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $phone          = trim($_POST['phone']);
     $address        = trim($_POST['address']);
     $payment_method = $_POST['payment_method'];
-    $note           = trim($_POST['note'] ?? '');
+    $raw_note       = trim($_POST['note'] ?? '');
+    $note           = ($voucher ? '[Voucher: ' . $voucher['code'] . ' (-' . $voucher['discount_percent'] . '%)] ' : '') . $raw_note;
 
     // ---- RÀNG BUỘC SERVER-SIDE ----
     $errs = [];
@@ -55,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             }
             $pdo->commit();
             unset($_SESSION['cart']);
+            unset($_SESSION['voucher']);
             
             // Redirect sang trang theo dõi đơn hàng & đếm ngược giao nước
             header("Location: /cart/order_success.php?id=" . $new_order_id);
@@ -203,6 +211,12 @@ $vietqr_url = "https://img.vietqr.io/image/MB-0987654321-compact2.png?amount=" .
                 <?php endforeach; ?>
             </div>
             <div class="summary-row" style="font-size:0.9rem;"><span>Tạm tính:</span><span><?php echo formatVND($subtotal); ?></span></div>
+            <?php if ($discount > 0): ?>
+            <div class="summary-row" style="font-size:0.9rem;color:#2563eb;font-weight:700;">
+                <span>Giảm giá (Voucher <?php echo htmlspecialchars($voucher['code']); ?>):</span>
+                <span>-<?php echo formatVND($discount); ?></span>
+            </div>
+            <?php endif; ?>
             <div class="summary-row" style="font-size:0.9rem;"><span>Phí vận chuyển:</span><span><?php echo $shipping==0?'Miễn phí':formatVND($shipping); ?></span></div>
             <div class="summary-row-total"><span>Tổng tiền:</span><span class="total-price"><?php echo formatVND($grand); ?></span></div>
         </div>
