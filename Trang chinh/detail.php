@@ -32,14 +32,23 @@ $reviews = $reviews_stmt->fetchAll();
 
 $review_msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
-    if (!$current_user) { $review_msg = 'Ban can dang nhap de gui danh gia!'; }
+    if (!$current_user) { $review_msg = 'Bạn cần đăng nhập để gửi đánh giá!'; }
     else {
         $rating  = intval($_POST['rating']);
         $comment = trim($_POST['comment']);
-        if ($rating >= 1 && $rating <= 5 && !empty($comment)) {
+        // ---- RÀNG BUỘC SERVER-SIDE ----
+        if ($rating < 1 || $rating > 5) {
+            $review_msg = '⚠ Số sao không hợp lệ (phải từ 1 đến 5).';
+        } elseif (empty($comment)) {
+            $review_msg = '⚠ Nội dung đánh giá không được để trống.';
+        } elseif (mb_strlen($comment) < 5) {
+            $review_msg = '⚠ Nội dung đánh giá phải có ít nhất 5 ký tự.';
+        } elseif (mb_strlen($comment) > 1000) {
+            $review_msg = '⚠ Nội dung đánh giá không được quá 1000 ký tự.';
+        } else {
             $pdo->prepare("INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (?,?,?,?)")->execute([$current_user['id'], $id, $rating, $comment]);
             header("Location: /detail.php?id=$id"); exit();
-        } else { $review_msg = 'Vui long nhap du so sao va noi dung!'; }
+        }
     }
 }
 
@@ -152,23 +161,78 @@ $basePrice   = $hasDiscount ? $product['discount_price'] : $product['price'];
                 <div style="padding:10px 15px;border-radius:var(--radius-sm);margin-bottom:15px;background:white;border:1px solid var(--border);"><?php echo $review_msg; ?></div>
             <?php endif; ?>
             <?php if ($current_user): ?>
-            <form action="/detail.php?id=<?php echo $id; ?>" method="POST">
+            <form action="/detail.php?id=<?php echo $id; ?>" method="POST" id="reviewForm" novalidate>
                 <div class="form-group">
-                    <label class="form-label">So sao</label>
-                    <select name="rating" class="form-control" style="width:150px;background:white;">
-                        <option value="5">5 sao (Xuat sac)</option>
-                        <option value="4">4 sao (Tot)</option>
-                        <option value="3">3 sao (Binh thuong)</option>
-                        <option value="2">2 sao (Kem)</option>
-                        <option value="1">1 sao (Rat kem)</option>
-                    </select>
+                    <label class="form-label">Số sao *</label>
+                    <!-- Star Rating UI -->
+                    <div id="star-picker" style="display:flex;gap:6px;margin-bottom:8px;">
+                        <?php for($s=5;$s>=1;$s--): ?>
+                        <label style="cursor:pointer;font-size:1.8rem;color:#d1d5db;transition:color .15s;" for="star<?php echo $s; ?>" title="<?php echo $s; ?> sao">
+                            <input type="radio" name="rating" id="star<?php echo $s; ?>" value="<?php echo $s; ?>" style="display:none;">
+                            ★
+                        </label>
+                        <?php endfor; ?>
+                    </div>
+                    <div class="field-error" id="rv_err_rating" style="display:none;color:#dc2626;font-size:0.82rem;"></div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Noi dung danh gia</label>
-                    <textarea name="comment" rows="4" class="form-control" placeholder="Chia se cam nhan cua ban..." style="background:white;" required></textarea>
+                    <label class="form-label">Nội dung đánh giá * <span id="rv_counter" style="float:right;font-size:0.8rem;color:var(--text-muted);font-weight:400;">0/1000</span></label>
+                    <textarea name="comment" id="rv_comment" rows="4" class="form-control" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm... (tối thiểu 5 ký tự)" style="background:white;"></textarea>
+                    <div class="field-error" id="rv_err_comment" style="display:none;color:#dc2626;font-size:0.82rem;"></div>
                 </div>
-                <button type="submit" name="submit_review" class="btn btn-primary">Gui Danh Gia</button>
+                <button type="submit" name="submit_review" class="btn btn-primary">⭐ Gửi Đánh Giá</button>
             </form>
+            <style>
+            #star-picker label:hover, #star-picker label:hover ~ label { color:#f59e0b; }
+            #star-picker input:checked ~ label { color:#d1d5db; }
+            #star-picker input:checked + label { color:#f59e0b; }
+            /* RTL trick for star rating */
+            #star-picker { flex-direction:row-reverse; justify-content:flex-end; }
+            #star-picker label:hover,
+            #star-picker label:hover ~ label,
+            #star-picker input:checked ~ label { color:#f59e0b!important; }
+            #star-picker input:checked + label,
+            #star-picker input:checked + label ~ label { color:#f59e0b!important; }
+            </style>
+            <script>
+            const rvCommentEl = document.getElementById('rv_comment');
+            const rvCntEl     = document.getElementById('rv_counter');
+            rvCommentEl.addEventListener('input', function(){
+                const len = this.value.length;
+                rvCntEl.textContent = len+'/1000';
+                rvCntEl.style.color = len>900?'#dc2626':len>700?'#f59e0b':'var(--text-muted)';
+                if(this.classList.contains('is-invalid') && len>=5) {
+                    this.classList.remove('is-invalid'); this.classList.add('is-valid');
+                    document.getElementById('rv_err_comment').style.display='none';
+                }
+            });
+            document.getElementById('reviewForm').addEventListener('submit', function(e){
+                let ok = true;
+                const rating = document.querySelector('input[name=rating]:checked');
+                if (!rating) {
+                    document.getElementById('rv_err_rating').textContent='⚠ Vui lòng chọn số sao đánh giá.';
+                    document.getElementById('rv_err_rating').style.display='block';
+                    ok = false;
+                } else {
+                    document.getElementById('rv_err_rating').style.display='none';
+                }
+                const v = rvCommentEl.value.trim();
+                if (!v) {
+                    rvCommentEl.classList.add('is-invalid');
+                    document.getElementById('rv_err_comment').textContent='⚠ Nội dung không được để trống.';
+                    document.getElementById('rv_err_comment').style.display='block'; ok=false;
+                } else if(v.length<5) {
+                    rvCommentEl.classList.add('is-invalid');
+                    document.getElementById('rv_err_comment').textContent='⚠ Nội dung phải có ít nhất 5 ký tự.';
+                    document.getElementById('rv_err_comment').style.display='block'; ok=false;
+                } else if(v.length>1000) {
+                    rvCommentEl.classList.add('is-invalid');
+                    document.getElementById('rv_err_comment').textContent='⚠ Không được quá 1000 ký tự.';
+                    document.getElementById('rv_err_comment').style.display='block'; ok=false;
+                }
+                if (!ok) e.preventDefault();
+            });
+            </script>
             <?php else: ?>
                 <p style="color:var(--text-muted);">Vui long <a href="/login/login_demo.php" style="color:var(--primary);font-weight:600;text-decoration:underline;">Dang Nhap</a> de viet danh gia.</p>
             <?php endif; ?>

@@ -23,7 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
     $payment_method = $_POST['payment_method'];
     $note           = trim($_POST['note'] ?? '');
 
-    if (!empty($fullname) && !empty($email) && !empty($phone) && !empty($address)) {
+    // ---- RÀNG BUỘC SERVER-SIDE ----
+    $errs = [];
+    if (empty($fullname))               $errs[] = 'Họ tên không được để trống.';
+    elseif (mb_strlen($fullname) < 2)   $errs[] = 'Họ tên phải có ít nhất 2 ký tự.';
+    elseif (mb_strlen($fullname) > 100) $errs[] = 'Họ tên không được quá 100 ký tự.';
+
+    if (empty($phone))                  $errs[] = 'Số điện thoại không được để trống.';
+    elseif (!preg_match('/^(0|\+84)(3|5|7|8|9)\d{8}$/', $phone)) $errs[] = 'Số điện thoại không hợp lệ (ví dụ: 0987654321).';
+
+    if (empty($email))                      $errs[] = 'Email không được để trống.';
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errs[] = 'Email không đúng định dạng.';
+
+    if (empty($address))               $errs[] = 'Địa chỉ không được để trống.';
+    elseif (mb_strlen($address) < 10)  $errs[] = 'Địa chỉ phải có ít nhất 10 ký tự.';
+
+    if (!in_array($payment_method, ['QR_CODE','COD','MOMO'])) $errs[] = 'Phương thức thanh toán không hợp lệ.';
+
+    if (empty($errs)) {
         try {
             $pdo->beginTransaction();
             $payment_status = ($payment_method === 'COD') ? 'unpaid' : 'pending';
@@ -47,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
             $error = 'Lỗi hệ thống: ' . $e->getMessage();
         }
     } else {
-        $error = 'Vui lòng nhập đầy đủ thông tin giao hàng!';
+        $error = implode('<br>', $errs);
     }
 }
 
@@ -65,21 +82,25 @@ $vietqr_url = "https://img.vietqr.io/image/MB-0987654321-compact2.png?amount=" .
             <form action="/cart/checkout.php" method="POST" id="checkout-form">
                 <div class="form-group">
                     <label class="form-label">Họ và tên người nhận *</label>
-                    <input type="text" name="fullname" class="form-control" value="<?php echo htmlspecialchars($fullname); ?>" required placeholder="Nguyễn Văn A">
+                    <input type="text" name="fullname" id="co_fullname" class="form-control" value="<?php echo htmlspecialchars($fullname); ?>" placeholder="Nguyễn Văn A">
+                <div class="field-error" id="coe_fullname" style="display:none;"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Số điện thoại *</label>
-                        <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($phone); ?>" required placeholder="0987654321">
+                        <input type="text" name="phone" id="co_phone" class="form-control" value="<?php echo htmlspecialchars($phone); ?>" placeholder="0987654321">
+                        <div class="field-error" id="coe_phone" style="display:none;"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email *</label>
-                        <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required placeholder="khachhang@gmail.com">
+                        <input type="email" name="email" id="co_email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" placeholder="khachhang@gmail.com">
+                        <div class="field-error" id="coe_email" style="display:none;"></div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Địa chỉ nhận hàng *</label>
-                    <input type="text" name="address" class="form-control" value="<?php echo htmlspecialchars($address); ?>" required placeholder="Số nhà, tên đường, phường/xã, quận/huyện...">
+                    <input type="text" name="address" id="co_address" class="form-control" value="<?php echo htmlspecialchars($address); ?>" placeholder="Số nhà, tên đường, phường/xã, quận/huyện...">
+                <div class="field-error" id="coe_address" style="display:none;"></div>
                 </div>
 
                 <div class="form-group" style="margin-top:25px;">
@@ -188,13 +209,64 @@ $vietqr_url = "https://img.vietqr.io/image/MB-0987654321-compact2.png?amount=" .
     </div>
 </section>
 
+<style>
+.field-error { color:#dc2626;font-size:0.82rem;margin-top:5px;display:flex;align-items:center;gap:4px;animation:fadeIn .2s ease; }
+.field-error::before { content:'⚠'; }
+.form-control.is-invalid { border-color:#dc2626!important;box-shadow:0 0 0 3px rgba(220,38,38,.1)!important; }
+.form-control.is-valid   { border-color:#22c55e!important;box-shadow:0 0 0 3px rgba(34,197,94,.1)!important; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+</style>
 <script>
 function togglePaymentQR(show) {
     const qrBox = document.getElementById('qr-preview-box');
-    if (qrBox) {
-        qrBox.style.display = show ? 'block' : 'none';
+    if (qrBox) qrBox.style.display = show ? 'block' : 'none';
+}
+// Checkout Validation
+const phoneRxCo = /^(0|\+84)(3|5|7|8|9)\d{8}$/;
+const emailRxCo = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const coErrs    = {};
+function coShow(id,msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='flex'; coErrs[id]=true; }
+function coClear(id)   { document.getElementById(id).style.display='none'; delete coErrs[id]; }
+function coOk(inp)     { inp.classList.remove('is-invalid'); inp.classList.add('is-valid'); }
+function coBad(inp)    { inp.classList.remove('is-valid');   inp.classList.add('is-invalid'); }
+
+function validateCoField(inp) {
+    const v = inp.value.trim(), n = inp.id;
+    if (n==='co_fullname') {
+        if (!v) { coBad(inp); coShow('coe_fullname','Họ tên không được để trống.'); }
+        else if (v.length<2) { coBad(inp); coShow('coe_fullname','Họ tên phải có ít nhất 2 ký tự.'); }
+        else { coOk(inp); coClear('coe_fullname'); }
+    } else if (n==='co_phone') {
+        if (!v) { coBad(inp); coShow('coe_phone','Số điện thoại không được để trống.'); }
+        else if (!phoneRxCo.test(v)) { coBad(inp); coShow('coe_phone','Số điện thoại không hợp lệ (VD: 0987654321).'); }
+        else { coOk(inp); coClear('coe_phone'); }
+    } else if (n==='co_email') {
+        if (!v) { coBad(inp); coShow('coe_email','Email không được để trống.'); }
+        else if (!emailRxCo.test(v)) { coBad(inp); coShow('coe_email','Email không đúng định dạng.'); }
+        else { coOk(inp); coClear('coe_email'); }
+    } else if (n==='co_address') {
+        if (!v) { coBad(inp); coShow('coe_address','Địa chỉ không được để trống.'); }
+        else if (v.length<10) { coBad(inp); coShow('coe_address','Địa chỉ phải có ít nhất 10 ký tự.'); }
+        else { coOk(inp); coClear('coe_address'); }
     }
 }
+['co_fullname','co_phone','co_email','co_address'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('blur',function(){ validateCoField(this); }); el.addEventListener('input',function(){ if(this.classList.contains('is-invalid')) validateCoField(this); }); }
+});
+document.getElementById('checkout-form').addEventListener('submit', function(e){
+    ['co_fullname','co_phone','co_email','co_address'].forEach(id=>{ const el=document.getElementById(id); if(el) validateCoField(el); });
+    if (Object.keys(coErrs).length > 0) {
+        e.preventDefault();
+        const firstBad = document.querySelector('.is-invalid');
+        if (firstBad) firstBad.scrollIntoView({behavior:'smooth',block:'center'});
+        const btn = document.querySelector('button[name=place_order]');
+        const orig = btn.textContent;
+        btn.textContent = '⚠ Vui lòng kiểm tra lại!';
+        btn.style.background = '#dc2626';
+        setTimeout(()=>{ btn.textContent=orig; btn.style.background=''; },2500);
+    }
+});
 </script>
 
 <?php require_once __DIR__ . '/../ThanhNgang/footer.php'; ?>

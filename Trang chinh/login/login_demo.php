@@ -39,6 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         .login-card { max-width:460px;margin:60px auto;background:white;border-radius:var(--radius-lg);padding:40px;box-shadow:var(--shadow-lg);border:1px solid var(--border); }
         .quick-box  { background:var(--light);border-radius:var(--radius-md);padding:20px;margin-top:25px;border:1px dashed var(--primary);text-align:center; }
+        .field-error { color:#dc2626;font-size:0.82rem;margin-top:5px;display:flex;align-items:center;gap:4px;animation:fadeIn .2s ease; }
+        .field-error::before { content:'⚠'; }
+        .form-control.is-invalid { border-color:#dc2626!important;box-shadow:0 0 0 3px rgba(220,38,38,.1)!important; }
+        .form-control.is-valid   { border-color:#22c55e!important;box-shadow:0 0 0 3px rgba(34,197,94,.1)!important; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
     </style>
 </head>
 <body style="background-color:#f8fafc;">
@@ -63,17 +68,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div style="background:#fee2e2;color:#dc2626;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:20px;font-weight:600;">⚠️ <?php echo $error; ?></div>
     <?php endif; ?>
 
-    <form action="/login/login_demo.php" method="POST">
+    <form action="/login/login_demo.php" method="POST" id="loginForm" novalidate>
         <div class="form-group">
             <label class="form-label">Tên đăng nhập *</label>
-            <input type="text" name="username" class="form-control" placeholder="nguyenvana hoặc admin" required>
+            <input type="text" name="username" id="inp_username" class="form-control" placeholder="nguyenvana hoặc admin" autocomplete="username">
+            <div class="field-error" id="err_username" style="display:none;"></div>
         </div>
         <div class="form-group" style="margin-bottom:25px;">
             <label class="form-label">Mật khẩu *</label>
-            <input type="password" name="password" class="form-control" placeholder="123456" required>
+            <div style="position:relative;">
+                <input type="password" name="password" id="inp_password" class="form-control" placeholder="Nhập mật khẩu..." autocomplete="current-password" style="padding-right:44px;">
+                <button type="button" onclick="togglePwd()" id="pwd-toggle" title="Hiện/Ẩn mật khẩu"
+                    style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;">👁</button>
+            </div>
+            <div class="field-error" id="err_password" style="display:none;"></div>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-weight:700;font-size:1rem;">Đăng Nhập Để Mua Hàng</button>
     </form>
+    <script>
+    function togglePwd() {
+        const inp = document.getElementById('inp_password');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+    function showErr(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg; el.style.display = 'flex';
+    }
+    function clearErr(id) { document.getElementById(id).style.display = 'none'; }
+    function setValid(inp) { inp.classList.remove('is-invalid'); inp.classList.add('is-valid'); }
+    function setInvalid(inp) { inp.classList.remove('is-valid'); inp.classList.add('is-invalid'); }
+
+    document.getElementById('inp_username').addEventListener('input', function() {
+        const v = this.value.trim();
+        if (!v) { setInvalid(this); showErr('err_username','Vui lòng nhập tên đăng nhập.'); }
+        else if (v.length < 3) { setInvalid(this); showErr('err_username','Tên đăng nhập tối thiểu 3 ký tự.'); }
+        else if (/[<>"';&]/.test(v)) { setInvalid(this); showErr('err_username','Tên đăng nhập chứa ký tự không hợp lệ.'); }
+        else { setValid(this); clearErr('err_username'); }
+    });
+    document.getElementById('inp_password').addEventListener('input', function() {
+        const v = this.value;
+        if (!v) { setInvalid(this); showErr('err_password','Vui lòng nhập mật khẩu.'); }
+        else if (v.length < 3) { setInvalid(this); showErr('err_password','Mật khẩu tối thiểu 3 ký tự.'); }
+        else { setValid(this); clearErr('err_password'); }
+    });
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        let ok = true;
+        const u = document.getElementById('inp_username');
+        const p = document.getElementById('inp_password');
+        if (!u.value.trim()) { e.preventDefault(); setInvalid(u); showErr('err_username','Vui lòng nhập tên đăng nhập.'); ok=false; }
+        else if (u.value.trim().length < 3) { e.preventDefault(); setInvalid(u); showErr('err_username','Tên đăng nhập tối thiểu 3 ký tự.'); ok=false; }
+        if (!p.value) { e.preventDefault(); setInvalid(p); showErr('err_password','Vui lòng nhập mật khẩu.'); ok=false; }
+        else if (p.value.length < 3) { e.preventDefault(); setInvalid(p); showErr('err_password','Mật khẩu tối thiểu 3 ký tự.'); ok=false; }
+        if (!ok) { document.querySelector('.btn-primary[type=submit]').textContent = '⚠ Kiểm tra lại thông tin!'; setTimeout(()=>{ document.querySelector('.btn-primary[type=submit]').textContent = 'Đăng Nhập Để Mua Hàng'; },2000); }
+    });
+    </script>
 
     <div class="quick-box">
         <div style="font-weight:700;margin-bottom:12px;color:var(--primary);font-size:0.9rem;text-transform:uppercase;">⚡ Đăng Nhập Nhanh (Dành Cho Dùng Thử)</div>

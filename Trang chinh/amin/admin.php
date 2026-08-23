@@ -652,3 +652,171 @@ $replied_contacts = $pdo->query("SELECT COUNT(*) FROM contacts WHERE status=2")-
 </section>
 
 <?php require_once __DIR__ . '/../ThanhNgang/footer.php'; ?>
+<style>
+.field-error { color:#dc2626;font-size:0.82rem;margin-top:4px;display:block;animation:fadIn .2s ease; }
+.form-control.is-invalid { border-color:#dc2626!important;box-shadow:0 0 0 3px rgba(220,38,38,.15)!important; }
+.form-control.is-valid   { border-color:#22c55e!important;box-shadow:0 0 0 3px rgba(34,197,94,.15)!important; }
+@keyframes fadIn { from{opacity:0;transform:translateY(-3px)} to{opacity:1;transform:translateY(0)} }
+</style>
+<script>
+/* ============================================================
+   ADMIN VALIDATION - GlowDrinks
+   Kiểm tra tất cả form trong trang quản trị
+============================================================ */
+function adOk(el)  { el.classList.remove('is-invalid'); el.classList.add('is-valid'); }
+function adBad(el) { el.classList.remove('is-valid');   el.classList.add('is-invalid'); }
+function adMsg(el, msg) {
+    let err = el.parentNode.querySelector('.field-error');
+    if (!err) { err = document.createElement('div'); err.className='field-error'; el.parentNode.appendChild(err); }
+    err.textContent = msg;
+}
+function adClear(el) {
+    const err = el.parentNode.querySelector('.field-error');
+    if (err) err.textContent = '';
+}
+function adVal(el, rules) {
+    const v = el.value.trim();
+    for (const [check, msg] of rules) { if (!check(v, el)) { adBad(el); adMsg(el, '⚠ '+msg); return false; } }
+    adOk(el); adClear(el); return true;
+}
+
+// ---------- 1. FORM THÊM SẢN PHẨM ----------
+const addProdForm = document.querySelector('form[action*="tab=products"] button[name=add_product]');
+if (addProdForm) {
+    addProdForm.closest('form').addEventListener('submit', function(e){
+        let ok = true;
+        const nameEl  = this.querySelector('[name=name]');
+        const catEl   = this.querySelector('[name=category_id]');
+        const priceEl = this.querySelector('[name=price]');
+        const discEl  = this.querySelector('[name=discount_price]');
+        const qtyEl   = this.querySelector('[name=quantity]');
+
+        if(!adVal(nameEl,[
+            [v=>v.length>0,  'Tên món uống không được để trống.'],
+            [v=>v.length>=2, 'Tên phải có ít nhất 2 ký tự.'],
+            [v=>v.length<=200,'Tên không được quá 200 ký tự.']
+        ])) { ok=false; }
+
+        if(!adVal(catEl,[
+            [v=>v!=='','Vui lòng chọn danh mục.']
+        ])) { ok=false; }
+
+        const p = parseInt(priceEl.value);
+        if(!adVal(priceEl,[
+            [v=>v!=='',     'Giá gốc không được để trống.'],
+            [v=>p>0,        'Giá gốc phải lớn hơn 0.'],
+            [v=>p<=100000000,'Giá không hợp lệ (quá lớn).']
+        ])) { ok=false; }
+
+        if (discEl && discEl.value !== '') {
+            const d = parseInt(discEl.value);
+            if(!adVal(discEl,[
+                [v=>d>=0,  'Giá khuyeń mãi không được âm.'],
+                [v=>d<p,   'Giá khuyến mãi phải nhỏ hơn giá gốc.']
+            ])) { ok=false; }
+        }
+
+        if (qtyEl && qtyEl.value !== '') {
+            const q = parseInt(qtyEl.value);
+            if(!adVal(qtyEl,[
+                [v=>q>=0,    'Số lượng không được âm.'],
+                [v=>q<=99999,'Số lượng không hợp lệ.']
+            ])) { ok=false; }
+        }
+
+        if (!ok) e.preventDefault();
+    });
+}
+
+// ---------- 2. FORM THÊM DANH MỤC ----------
+const addCatForm = document.querySelector('form[action*="tab=categories"] button[name=add_category]');
+if (addCatForm) {
+    addCatForm.closest('form').addEventListener('submit', function(e){
+        const catNameEl = this.querySelector('[name=cat_name]');
+        if (!adVal(catNameEl,[
+            [v=>v.length>0,  'Tên danh mục không được để trống.'],
+            [v=>v.length>=2, 'Tên danh mục phải có ít nhất 2 ký tự.'],
+            [v=>v.length<=100,'Tên danh mục không được quá 100 ký tự.']
+        ])) { e.preventDefault(); }
+    });
+}
+
+// ---------- 3. FORM THÊM MÃ GIẢM GIÁ ----------
+const addCpnForm = document.querySelector('form[action*="tab=promotions"] button[name=add_coupon]');
+if (addCpnForm) {
+    addCpnForm.closest('form').addEventListener('submit', function(e){
+        let ok = true;
+        const codeEl = this.querySelector('[name=code]');
+        const pctEl  = this.querySelector('[name=discount_percent]');
+        const minEl  = this.querySelector('[name=min_order_amount]');
+
+        if(!adVal(codeEl,[
+            [v=>v.length>0,   'Mã khuyén mãi không được để trống.'],
+            [v=>v.length>=3,  'Mã phải có ít nhất 3 ký tự.'],
+            [v=>/^[A-Z0-9_]+$/.test(v),'Mã chỉ gồm chữ in hoa, số và gạch dưới.']
+        ])) { ok=false; }
+
+        const pct = parseInt(pctEl.value);
+        if(!adVal(pctEl,[
+            [v=>v!=='',  '% giảm giá không được để trống.'],
+            [v=>pct>=1,  '% giảm giá phải ít nhất 1%.'],
+            [v=>pct<=100,'% giảm giá không được quá 100%.']
+        ])) { ok=false; }
+
+        if (minEl && minEl.value !== '') {
+            const min = parseInt(minEl.value);
+            if(!adVal(minEl,[
+                [v=>min>=0,      'Đơn tối thiểu không được âm.'],
+                [v=>min<=99999999,'Đơn tối thiểu không hợp lệ.']
+            ])) { ok=false; }
+        }
+
+        if (!ok) e.preventDefault();
+    });
+}
+
+// ---------- 4. FORM TRẢ LỜI LIÊN HỆ ----------
+const replyForm = document.querySelector('form[action*="tab=contacts"] button[name=reply_contact]');
+if (replyForm) {
+    replyForm.closest('form').addEventListener('submit', function(e){
+        const txtEl = this.querySelector('[name=reply_text]');
+        if (!adVal(txtEl,[
+            [v=>v.length>0,  'Nội dung phản hồi không được để trống.'],
+            [v=>v.length>=10,'Nội dung phải có ít nhất 10 ký tự.']
+        ])) { e.preventDefault(); }
+    });
+}
+
+// ---------- 5. XÁC NHẬN XOÁ AN TOÀN HƠN ----------
+document.querySelectorAll('a[href*="delete_"], a[href*="delete"]').forEach(a=>{
+    if(!a.getAttribute('onclick')) {
+        a.addEventListener('click', function(e){
+            if(!confirm('⚠ Bạn chắc chắn muốn xóa mục này?\nHành động này không thể hoàn tác!')) e.preventDefault();
+        });
+    }
+});
+
+// ---------- 6. VALIDATE FORM CHUẨN FORM SETTINGS ----------
+const settingsForm = document.querySelector('#settings-form, form[action="#"]');
+if (settingsForm) {
+    settingsForm.addEventListener('submit', function(e){
+        let ok = true;
+        this.querySelectorAll('input[type=text], input[type=email]').forEach(inp=>{
+            if (inp.required && !inp.value.trim()) { adBad(inp); adMsg(inp,'Trường này không được để trống.'); ok=false; }
+            else if (inp.type==='email' && inp.value.trim()) {
+                const emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+                if(!emailRx.test(inp.value.trim())){ adBad(inp); adMsg(inp,'Email không hợp lệ.'); ok=false; }
+            }
+        });
+        if (!ok) e.preventDefault();
+    });
+}
+
+// ---------- 7. REAL-TIME FEEDBACK TRÊN TẤT CẢ INPUT ADMIN ----------
+document.querySelectorAll('.form-control[required]').forEach(el=>{
+    el.addEventListener('input', function() {
+        if (this.value.trim()) { adOk(this); adClear(this); }
+        else { adBad(this); adMsg(this,'⚠ Trường này bắt buộc.'); }
+    });
+});
+</script>
