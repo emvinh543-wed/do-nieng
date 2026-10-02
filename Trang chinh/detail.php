@@ -1,8 +1,18 @@
 <?php
-require_once __DIR__ . '/ThanhNgang/header.php';
+require_once __DIR__ . '/config/config.php';
+
+$current_user = null;
+if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $current_user = $stmt->fetch();
+}
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-if ($id <= 0) { header("Location: /index/"); exit(); }
+if ($id <= 0) { 
+    header("Location: /index/"); 
+    exit(); 
+}
 
 $stmt = $pdo->prepare("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = ? AND p.status = 1");
 $stmt->execute([$id]);
@@ -11,12 +21,6 @@ $product = $stmt->fetch();
 $site_lang = get_site_lang();
 if ($product) {
     $product = localize_row($product, $site_lang, ['name','description','content']);
-}
-
-if (!$product) {
-    echo '<div class="section" style="text-align:center;padding:100px 20px;"><h2>San pham khong ton tai!</h2><a href="/index/" class="btn btn-primary" style="margin-top:20px;">Ve Trang Chu</a></div>';
-    require_once __DIR__ . '/../ThanhNgang/footer.php';
-    exit();
 }
 
 $toppings = $pdo->query("SELECT * FROM products WHERE category_id = 5 AND status = 1 ORDER BY price ASC")->fetchAll();
@@ -32,8 +36,9 @@ $reviews = $reviews_stmt->fetchAll();
 
 $review_msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
-    if (!$current_user) { $review_msg = 'Bạn cần đăng nhập để gửi đánh giá!'; }
-    else {
+    if (!$current_user) { 
+        $review_msg = 'Bạn cần đăng nhập để gửi đánh giá!'; 
+    } else {
         $rating  = intval($_POST['rating']);
         $comment = trim($_POST['comment']);
         // ---- RÀNG BUỘC SERVER-SIDE ----
@@ -47,9 +52,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
             $review_msg = '⚠ Nội dung đánh giá không được quá 1000 ký tự.';
         } else {
             $pdo->prepare("INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (?,?,?,?)")->execute([$current_user['id'], $id, $rating, $comment]);
-            header("Location: /detail.php?id=$id"); exit();
+            header("Location: /detail.php?id=$id"); 
+            exit();
         }
     }
+}
+
+require_once __DIR__ . '/ThanhNgang/header.php';
+
+if (!$product) {
+    echo '<div class="section" style="text-align:center;padding:100px 20px;"><h2>San pham khong ton tai!</h2><a href="/index/" class="btn btn-primary" style="margin-top:20px;">Ve Trang Chu</a></div>';
+    require_once __DIR__ . '/ThanhNgang/footer.php';
+    exit();
 }
 
 $hasDiscount = ($product['discount_price'] > 0);

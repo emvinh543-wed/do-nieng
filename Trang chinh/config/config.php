@@ -2,6 +2,9 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+if (!ob_get_level()) {
+    ob_start();
+}
 
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');

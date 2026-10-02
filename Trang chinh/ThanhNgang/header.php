@@ -73,6 +73,38 @@ if (isset($_SESSION['user_id'])) {
             color: white;
             box-shadow: 0 6px 18px rgba(245,166,35,0.25);
         }
+        .nav-container {
+            max-width: 1420px;
+            padding: 12px 24px;
+            gap: 16px;
+        }
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-shrink: 0;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-link {
+            white-space: nowrap;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .search-nav-input {
+            width: 130px;
+            transition: width 0.25s ease;
+        }
+        .search-nav-input:focus {
+            width: 170px;
+        }
     </style>
 </head>
 <body>
@@ -107,6 +139,7 @@ if (isset($_SESSION['user_id'])) {
 
             <form action="/index/" method="GET" style="display:flex;gap:5px;">
                 <input type="text" name="search" data-i18n-placeholder="search_placeholder" placeholder="Tim mon uong..."
+                       class="search-nav-input"
                        style="padding:7px 13px;font-size:0.85rem;border:1.5px solid #F0E8D0;border-radius:20px;background:#fff;"
                        value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                 <button type="submit" class="btn btn-primary" style="padding:7px 14px;font-size:0.85rem;border-radius:20px;" data-i18n="search_btn">Tim</button>

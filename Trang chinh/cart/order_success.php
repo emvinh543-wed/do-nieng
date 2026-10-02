@@ -1,14 +1,22 @@
 <?php
-require_once __DIR__ . '/../ThanhNgang/header.php';
+require_once __DIR__ . '/../config/config.php';
 
 $order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-if ($order_id <= 0) { header("Location: /index/"); exit(); }
+if ($order_id <= 0) { 
+    header("Location: /index/"); 
+    exit(); 
+}
 
 $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
 $stmt->execute([$order_id]);
 $order = $stmt->fetch();
 
-if (!$order) { header("Location: /index/"); exit(); }
+if (!$order) { 
+    header("Location: /index/"); 
+    exit(); 
+}
+
+require_once __DIR__ . '/../ThanhNgang/header.php';
 
 // Confirmed payment trigger
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_qr_paid'])) {

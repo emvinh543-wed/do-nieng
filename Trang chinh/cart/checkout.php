@@ -1,8 +1,18 @@
 <?php
-require_once __DIR__ . '/../ThanhNgang/header.php';
+require_once __DIR__ . '/../config/config.php';
+
+$current_user = null;
+if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $current_user = $stmt->fetch();
+}
 
 $cart = $_SESSION['cart'] ?? [];
-if (count($cart) === 0) { header("Location: /index/"); exit(); }
+if (count($cart) === 0) { 
+    header("Location: /index/"); 
+    exit(); 
+}
 
 $subtotal = array_sum(array_column($cart, 'total_item_amount'));
 $voucher  = $_SESSION['voucher'] ?? null;
@@ -77,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
 }
 
 $vietqr_url = "https://img.vietqr.io/image/MB-0987654321-compact2.png?amount=" . $grand . "&addInfo=TT%20GLOWDRINKS&accountName=GLOWDRINKS%20STORE";
+
+require_once __DIR__ . '/../ThanhNgang/header.php';
 ?>
 <section class="section">
     <h2 class="section-title" style="margin-bottom:35px;">Thông Tin <span>Thanh Toán & Đặt Hàng</span></h2>
