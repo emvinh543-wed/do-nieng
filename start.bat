@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal
 title GLOWDRINKS - TRINH KHOI DONG VA TU DONG SUA LOI HE THONG
 color 0B
@@ -9,24 +10,25 @@ set "PORT=8000"
 
 :MAIN_MENU
 cls
-echo ===============================================================================
-echo                HE THONG QUAN LY VA BAN DO UONG GLOWDRINKS
-echo                   (Bo cong cu tu dong sua loi he thong)
-echo ===============================================================================
+echo  =============================================================================
+echo                HE THONG QUAN LY VA BAN DO UONG GLOWDRINKS                   
+echo                    (Bo Cong Cu Tu Dong Sua Loi He Thong)                     
+echo  =============================================================================
 echo.
-echo   [1] Khoi dong Server va Mo Web (Tu dong sua loi toan bo) [Mac dinh]
-echo   [2] Kiem tra va Chuan doan he thong (PHP, MySQL, Database, Extensions)
-echo   [3] Khoi phuc Database goc (Reset va Tu dong nap lai toan bo du lieu)
-echo   [4] Giai phong cong mang %PORT% (Dong cac server cu bi treo)
-echo   [5] Quet loi cu phap ma nguon PHP (Lint Check)
-echo   [6] Doi cong Server (Port hien tai: %PORT%)
-echo   [0] Thoat
+echo    [1] Khoi dong Server va Mo Website (Tu dong sua loi)   [Mac dinh]
+echo    [2] Kiem tra va Chuan doan he thong (PHP, MySQL, DB)
+echo    [3] Khoi phuc Database goc (Reset va Nap lai du lieu)
+echo    [4] Giai phong cong mang %PORT% (Dong tien trinh PHP treo)
+echo    [5] Quet loi cu phap ma nguon PHP (Lint Check)
+echo    [6] Doi cong Server (Port hien tai: %PORT%)
+echo    [7] Mo Frontend Dashboard (Giao dien Web Control Panel) [Moi]
+echo    [0] Thoat
 echo.
-echo ===============================================================================
-echo He thong se tu dong chon [1] sau 5 giay neu ban khong nhap...
-echo ===============================================================================
+echo  =============================================================================
+echo   Tu dong chon [1] sau 5 giay neu ban khong nhap... (Port: %PORT%)
+echo  =============================================================================
 
-choice /c 1234560 /t 5 /d 1 /n /m "Nhap lua chon cua ban [1-6, 0]: "
+choice /c 12345670 /t 5 /d 1 /n /m "Nhap lua chon cua ban [1-7, 0]: "
 set "USER_CHOICE=%ERRORLEVEL%"
 
 if "%USER_CHOICE%"=="1" goto DO_START
@@ -35,31 +37,34 @@ if "%USER_CHOICE%"=="3" goto DO_RESET_DB
 if "%USER_CHOICE%"=="4" goto DO_CLEAN_PORT
 if "%USER_CHOICE%"=="5" goto DO_LINT
 if "%USER_CHOICE%"=="6" goto DO_CHANGE_PORT
-if "%USER_CHOICE%"=="7" goto DO_EXIT
+if "%USER_CHOICE%"=="7" goto DO_OPEN_FRONTEND
+if "%USER_CHOICE%"=="8" goto DO_EXIT
 goto MAIN_MENU
 
 :DO_START
 cls
-echo ===============================================================================
-echo                   DANG TU DONG KIEM TRA VA KHOI DONG SERVER
-echo ===============================================================================
+echo  =============================================================================
+echo                    DANG KIEM TRA VA KHOI DONG SERVER                          
+echo  =============================================================================
 echo.
 
 call :FIND_PHP
 if errorlevel 1 goto PAUSE_AND_MENU
 
+call :CHECK_AND_START_MYSQL
+
 echo [*] Dang tien hanh tu dong chuan doan va sua loi...
 php "%ROOT_DIR%tools\system_diagnose.php" check %PORT%
 if errorlevel 1 (
     echo.
-    echo [CANH BAO] He thong phat hien co loi chua the tu dong khac phuc.
-    echo Vui long kiem tra lai thong bao ben tren truoc khi tiep tuc!
+    echo [CANH BAO] He thong phat hien co loi. Vui long kiem tra thong bao tren!
     echo.
     pause
 )
 
 echo.
 echo [1/3] Dang khoi dong PHP Local Server tai port %PORT%...
+echo [%date% %time%] [START_SERVER] Khoi dong PHP Server tai port %PORT% >> "%ROOT_DIR%history.log"
 cd /d "%APP_DIR%"
 start "GlowDrinks Server (Port %PORT%)" php -S 127.0.0.1:%PORT%
 
@@ -70,24 +75,98 @@ echo [3/3] Dang mo website GlowDrinks tren trinh duyet...
 start http://127.0.0.1:%PORT%/
 
 echo.
-echo ===============================================================================
-echo  KHOI DONG THANH CONG!
-echo  - Dia chi Website : http://127.0.0.1:%PORT%/
-echo  - Tai khoan Admin : admin  /  Mat khau: 123456
-echo  - Luu y: Giu nguyen cua so PHP Server dang chay de khong bi ngat ket noi.
-echo ===============================================================================
+echo  =============================================================================
+echo   KHOI DONG SERVER THANH CONG!                                                
+echo   -------------------------------------------------------------------------   
+echo   - Website Khach Hang : http://127.0.0.1:%PORT%/                             
+echo   - Frontend Dashboard : http://127.0.0.1:%PORT%/control_panel.php            
+echo   - Trang Admin        : http://127.0.0.1:%PORT%/amin/admin.php               
+echo   - Tai khoan Admin    : admin  /  Mat khau: 123456                           
+echo   -------------------------------------------------------------------------   
+echo   Luu y: Giu nguyen cua so "GlowDrinks Server" de duy tri ket noi!            
+echo  =============================================================================
+echo.
+pause
+goto MAIN_MENU
+
+:CHECK_AND_START_MYSQL
+echo [*] Kiem tra ket noi MySQL (Port 3306)...
+netstat -ano | findstr /R /C:":3306 .*LISTENING" >nul 2>&1
+if not errorlevel 1 (
+    echo   [OK] MySQL Server dang hoat dong san sang.
+    exit /b 0
+)
+
+echo   [!] MySQL chua chay. Dang tu dong khoi dong MySQL/WampServer...
+net start wampmysqld64 >nul 2>&1
+
+netstat -ano | findstr /R /C:":3306 .*LISTENING" >nul 2>&1
+if not errorlevel 1 (
+    echo   [OK] Da khoi dong MySQL Service thanh cong.
+    exit /b 0
+)
+
+for %%W in ("E:\BE\Warm\wampmanager.exe" "C:\wamp64\wampmanager.exe" "D:\wamp64\wampmanager.exe") do (
+    if exist "%%~W" (
+        echo   [>] Dang goi WampServer tai: %%~W
+        explorer.exe "%%~W"
+        echo   [>] Vui long bam YES neu Windows hien hop thoai yeu cau quyen Admin!
+        goto WAIT_MYSQL_BOOT
+    )
+)
+
+:WAIT_MYSQL_BOOT
+echo [*] Dang doi MySQL khoi dong...
+for /l %%I in (1,1,6) do (
+    ping 127.0.0.1 -n 2 >nul
+    netstat -ano | findstr /R /C:":3306 .*LISTENING" >nul 2>&1
+    if not errorlevel 1 (
+        echo   [OK] MySQL da ket noi thanh cong tren cong 3306!
+        exit /b 0
+    )
+)
+echo   [!] Neu van chua ket noi, hay dam bao bieu tuong WampServer da co mau XANH.
+exit /b 0
+
+:DO_OPEN_FRONTEND
+cls
+echo  =============================================================================
+echo                 MO FRONTEND DASHBOARD (WEB CONTROL PANEL)                     
+echo  =============================================================================
+echo.
+call :FIND_PHP
+if errorlevel 1 goto PAUSE_AND_MENU
+
+call :CHECK_AND_START_MYSQL
+
+echo [*] Dang kiem tra cong %PORT%...
+netstat -ano | findstr /R /C:":%PORT% .*LISTENING" >nul 2>&1
+if errorlevel 1 (
+    echo [*] Server chua chay tai port %PORT%. Dang tu dong khoi dong server...
+    cd /d "%APP_DIR%"
+    start "GlowDrinks Server (Port %PORT%)" php -S 127.0.0.1:%PORT%
+    ping 127.0.0.1 -n 2 >nul
+)
+
+echo [*] Dang mo Giao dien Frontend Control Center tren trinh duyet...
+start http://127.0.0.1:%PORT%/control_panel.php
+
+echo.
+echo [OK] Da mo: http://127.0.0.1:%PORT%/control_panel.php
 echo.
 pause
 goto MAIN_MENU
 
 :DO_DIAGNOSE
 cls
-echo ===============================================================================
-echo                     CHUAN DOAN VA KIEM TRA HE THONG
-echo ===============================================================================
+echo  =============================================================================
+echo                     CHUAN DOAN VA KIEM TRA HE THONG                           
+echo  =============================================================================
 echo.
 call :FIND_PHP
 if errorlevel 1 goto PAUSE_AND_MENU
+
+call :CHECK_AND_START_MYSQL
 
 php "%ROOT_DIR%tools\system_diagnose.php" check %PORT%
 echo.
@@ -96,9 +175,9 @@ goto MAIN_MENU
 
 :DO_RESET_DB
 cls
-echo ===============================================================================
-echo                       KHOI PHUC DATABASE GOC
-echo ===============================================================================
+echo  =============================================================================
+echo                       KHOI PHUC DATABASE GOC                                  
+echo  =============================================================================
 echo.
 echo CANH BAO: Thao tac nay se xoa toan bo du lieu cu va nap lai database goc
 echo (bao gom danh muc, san pham, anh dep va tai khoan mac dinh).
@@ -113,6 +192,8 @@ if /i not "%CONFIRM%"=="y" (
 call :FIND_PHP
 if errorlevel 1 goto PAUSE_AND_MENU
 
+call :CHECK_AND_START_MYSQL
+
 php "%ROOT_DIR%tools\system_diagnose.php" reset-db
 echo.
 pause
@@ -120,9 +201,9 @@ goto MAIN_MENU
 
 :DO_CLEAN_PORT
 cls
-echo ===============================================================================
-echo                     GIAI PHONG CONG MANG %PORT%
-echo ===============================================================================
+echo  =============================================================================
+echo                     GIAI PHONG CONG MANG %PORT%                               
+echo  =============================================================================
 echo.
 call :FIND_PHP
 if errorlevel 1 goto PAUSE_AND_MENU
@@ -134,9 +215,9 @@ goto MAIN_MENU
 
 :DO_LINT
 cls
-echo ===============================================================================
-echo                 QUET KIEM TRA LOI CU PHAP MA NGUON PHP
-echo ===============================================================================
+echo  =============================================================================
+echo                 QUET KIEM TRA LOI CU PHAP MA NGUON PHP                        
+echo  =============================================================================
 echo.
 call :FIND_PHP
 if errorlevel 1 goto PAUSE_AND_MENU
@@ -148,9 +229,9 @@ goto MAIN_MENU
 
 :DO_CHANGE_PORT
 cls
-echo ===============================================================================
-echo                         THAY DOI CONG SERVER
-echo ===============================================================================
+echo  =============================================================================
+echo                         THAY DOI CONG SERVER                                  
+echo  =============================================================================
 echo Cong hien tai: %PORT%
 echo (Goi y cac cong thong dung: 8000, 8080, 8088, 8888, 3000)
 echo.

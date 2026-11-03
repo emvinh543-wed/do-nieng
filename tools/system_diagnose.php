@@ -212,6 +212,13 @@ function checkPhpSyntax($dir) {
     return $errorCount === 0;
 }
 
+function logHistory($action, $message) {
+    $logFile = BASE_DIR . DIRECTORY_SEPARATOR . 'history.log';
+    $time = date('Y-m-d H:i:s');
+    $logLine = "[$time] [" . str_pad($action, 12, ' ') . "] $message\n";
+    @file_put_contents($logFile, $logLine, FILE_APPEND);
+}
+
 // =================== RUN ===================
 $command = $argv[1] ?? 'check';
 
@@ -222,24 +229,29 @@ switch ($command) {
         $extOk = checkExtensions();
         $dbOk = checkAndFixDatabase($configFile, false);
         echo "==============================================\n\n";
+        $statusStr = ($extOk && $dbOk) ? "THANH CONG (PHP & MySQL OK)" : "CO CANH BAO/LOI";
+        logHistory('DIAGNOSE', "Kiem tra he thong tai cong $targetPort: $statusStr");
         exit(($extOk && $dbOk) ? 0 : 1);
 
     case 'free-port':
         echo "\n=== GIAI PHONG CONG MANG $targetPort ===\n";
         freePort($targetPort);
         echo "=========================================\n\n";
+        logHistory('FREE_PORT', "Giai phong cong mang $targetPort");
         exit(0);
 
     case 'reset-db':
         echo "\n=== KHOI PHUC / IMPORT LAI DATABASE ===\n";
         $ok = checkAndFixDatabase($configFile, true);
         echo "========================================\n\n";
+        logHistory('RESET_DB', "Khoi phuc database goc: " . ($ok ? "Thanh cong" : "That bai"));
         exit($ok ? 0 : 1);
 
     case 'lint':
         echo "\n=== QUET LOI CU PHAP MA NGUON PHP ===\n";
         $ok = checkPhpSyntax(BASE_DIR . '/Trang chinh');
         echo "=======================================\n\n";
+        logHistory('LINT_CHECK', "Quet cu phap PHP: " . ($ok ? "Khong co loi" : "Phat hien loi"));
         exit($ok ? 0 : 1);
 
     default:

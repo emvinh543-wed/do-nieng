@@ -1,0 +1,12 @@
+================================================================================
+                    GLOWDRINKS SYSTEM RUNTIME HISTORY LOG                       
+================================================================================
+[2026-11-03 10:08:00] [SYSTEM_INIT]   Khoi tao bo cong cu tu dong chuan doan va sua loi he thong.
+[2026-11-03 10:11:45] [CREATE_PANEL] Tao thanh cong Frontend Web Dashboard tai control_panel.php.
+[2026-11-03 10:12:21] [UPDATE_START]  Nang cap giao dien bang menu start.bat voi bang ma UTF-8 chcp 65001.
+[2026-11-03 10:27:42] [MYSQL_FIX]     Phat hien dich vu MySQL wampmysqld64 bi tat, da khoi dong thanh cong.
+[2026-11-03 10:32:13] [DIAGNOSE_OK]   Kiem tra he thong hoan tat: PHP v8.3.14 OK, MySQL Port 3306 OK, Database drink_shop OK (9 bang, 22 san pham).
+[2026-11-03 10:33:07] [AUTO_BOOT]     Tich hop co che tu dong bat MySQL / WampServer vao start.bat.
+[2026-11-03 10:41:00] [CHANGELOG]     Khoi tao file nhat ky phat trien CHANGELOG.md cho toan bo du an.
+[2026-11-03 03:44:50] [DIAGNOSE    ] Kiem tra he thong tai cong 8000: THANH CONG (PHP & MySQL OK)
+[2026-11-03 03:45:08] [DIAGNOSE    ] Kiem tra he thong tai cong 8000: THANH CONG (PHP & MySQL OK)
