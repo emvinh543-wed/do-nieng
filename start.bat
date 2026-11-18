@@ -106,6 +106,14 @@ if not errorlevel 1 (
     exit /b 0
 )
 
+for %%D in ("E:\BE\Warm\bin\mysql\mysql9.1.0" "E:\BE\Warm\bin\mysql\mysql*" "C:\wamp64\bin\mysql\mysql*" "D:\wamp64\bin\mysql\mysql*") do (
+    if exist "%%~D\bin\mysqld.exe" if exist "%%~D\my.ini" (
+        echo   [>] Dang khoi dong MySQL Daemon tai: %%~D\bin\mysqld.exe
+        start "MySQL Daemon" /B "%%~D\bin\mysqld.exe" --defaults-file="%%~D\my.ini"
+        goto WAIT_MYSQL_BOOT
+    )
+)
+
 for %%W in ("E:\BE\Warm\wampmanager.exe" "C:\wamp64\wampmanager.exe" "D:\wamp64\wampmanager.exe") do (
     if exist "%%~W" (
         echo   [>] Dang goi WampServer tai: %%~W
