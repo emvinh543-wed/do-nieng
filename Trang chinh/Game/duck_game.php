@@ -709,6 +709,7 @@ if (isset($pdo)) {
                     <label data-i18n="chunk_label">Tọa Độ Chunk</label>
                     <span id="chunk-val" style="color:#c084fc;font-size:1.1rem;">[0, 0]</span>
                 </div>
+                <a href="/" class="btn-leaderboard-toggle" style="background:linear-gradient(135deg, #ea580c, #c2410c);border-color:#fb923c;text-decoration:none;" title="Quay lai cua hang GlowDrinks">🏠 Ve GlowDrinks</a>
                 <a href="/Game/farm_game.php" class="btn-leaderboard-toggle" style="background:linear-gradient(135deg, #15803d, #166534);border-color:#4ade80;text-decoration:none;">
                     🌱 Game Làm Vườn 2D
                 </a>
@@ -896,6 +897,7 @@ if (isset($pdo)) {
 
             <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
                 <button class="btn-play" onclick="showStartModal()" data-i18n="restart_btn">🔄 ĐỔI BẢN ĐỒ / VỊT KÍCH THÍCH</button>
+                <a href="/cart/cart.php" class="btn-play" style="background:linear-gradient(135deg, #ea580c, #c2410c);text-decoration:none;display:inline-flex;align-items:center;" title="Dat nuoc va dung ma voucher">🍹 ĐẶT NƯỚC DÙNG MÃ (GIẢM 20%)</a>
                 <button class="btn-play" onclick="toggleLeaderboardModal()" style="background:#0284c7;" data-i18n="view_leaderboard_btn">🏆 XEM BẢNG HẠNG</button>
             </div>
         </div>
